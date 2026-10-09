@@ -1,0 +1,8 @@
+# Signing keys: NEVER commit them
+*.xssk
+# local work
+*.xisf
+*.fits
+*.fit
+__pycache__/
+.DS_Store

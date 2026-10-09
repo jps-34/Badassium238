@@ -1,8 +1,8 @@
-# Maintenance : publication et signature
+# Maintenance : développement, publication et signature
 
 Notes pour l'auteur. Rien ici n'est nécessaire pour utiliser le script.
 
-## 1. Mise en ligne initiale
+## 1. Mise en ligne initiale (faite en 1.0.3, gardée pour mémoire)
 
 1. Le nom d'utilisateur `jps-34` est déjà en place partout (README, page du dépôt, en-têtes des
    scripts), et le dépôt de mises à jour est déjà construit dans `docs/`. Pour le reconstruire
@@ -42,25 +42,66 @@ et [Update repositories](https://pixinsight.com/doc/docs/PIRepositoryReference/P
    recontacte si besoin. C'est une vérification d'identité, pas une revue du code. Sans ce statut,
    la signature n'est reconnue que sur tes propres machines.
 
-## 3. Publier une version (signée)
+## 3. Branche dev, puis passage en prod
 
-L'ordre compte : toute modification après une signature l'invalide.
+`main` = la production : GitHub Pages sert `docs/` depuis `main`, donc tout ce qui arrive sur `main`
+part chez les utilisateurs PixInsight. Une nouvelle version va d'abord sur `dev`.
 
-1. Mettre à jour `VERSION` dans les deux scripts et le `CHANGELOG.md`.
-2. Signer `scripts/Badassium238.js` et `scripts/legacy/Badassium238_PI193.js` avec le script
-   **CodeSign** : il crée les fichiers `.xsgn` à côté des `.js`.
-3. `python3 tools/build_repo.py --user jps-34` : les `.xsgn` sont inclus dans les archives,
-   les empreintes SHA-1 recalculées, `docs/updates.xri` régénéré.
-4. Signer `docs/updates.xri` avec **CodeSign** (la signature est ajoutée à la fin du fichier).
-5. Commit et push. GitHub Pages met le dépôt à jour en une minute environ.
+Mettre une nouvelle version sur dev (exemple avec le zip de la 1.1.0) :
 
-Les `.xsgn` se committent avec les scripts : ils permettent aussi de vérifier une installation
-manuelle.
+```bash
+cd ~/Badassium238
+git switch dev                 # la première fois : git switch -c dev
+git rm -rq .
+unzip -o <dossier de téléchargement>/Badassium238-v1.1.0.zip -d /tmp/b238
+cp -a /tmp/b238/Badassium238/. .
+git add -A
+git commit -m "Badassium238 1.1.0"
+git push -u origin dev
+```
 
-## 4. Points à vérifier au premier essai
+Tester dans PixInsight : *Script > Execute Script File*, choisir
+`~/Badassium238/scripts/Badassium238.js`. Le script tourne sans être installé, la version de prod
+reste en place.
 
-* Que PixInsight lit bien le dépôt servi par GitHub Pages (il ne demande que des fichiers statiques
-  en HTTPS ; d'autres dépôts PixInsight fonctionnent sur ce principe, mais celui-ci n'a pas encore
-  été testé).
-* Que la version PI 1.9.3 tourne sur une vraie installation 1.9.3 (elle n'a été validée qu'en
-  simulation).
+Passer en prod une fois validée :
+
+```bash
+git switch main
+git merge dev
+git tag -a v1.1.0 -m "Badassium238 1.1.0"
+git push origin main --tags
+git switch dev
+```
+
+Puis, dans PixInsight, *Resources > Updates > Check for Updates*.
+
+Avec la signature (plus tard), l'ordre compte : signer les deux `.js` avec **CodeSign**, lancer
+`python3 tools/build_repo.py --user jps-34`, signer `docs/updates.xri` en dernier, puis commit.
+
+## 4. Versions et historique
+
+* Numérotation `MAJEUR.MINEUR.CORRECTIF` : correctif = bug corrigé sans changement de résultat
+  voulu, mineur = nouvelle fonction, majeur = réglages ou résultats incompatibles.
+* Chaque version publiée a son étiquette `vX.Y.Z` et sa page *Release* avec ses deux zips. C'est là
+  que les anciennes versions restent téléchargeables : le dépôt PixInsight (`docs/`) ne sert que la
+  dernière.
+* L'historique complet reste dans git : `git log --oneline --decorate`.
+* Récupérer un fichier d'une ancienne version :
+  `git show v1.0.3:scripts/Badassium238.js > Badassium238-1.0.3.js`
+
+## 5. Dépannage : modifier par le site GitHub (sans git)
+
+À réserver aux petites corrections de texte (README, CHANGELOG). Attention : une modification faite
+sur le site dans la branche `main` est publiée immédiatement. Pour un script, passer par dev.
+
+1. Sur la page du dépôt, ouvrir le dossier concerné, puis *Add file > Upload files* et déposer les
+   fichiers modifiés : un fichier du même nom remplace l'ancien.
+2. *Commit changes*. Penser ensuite à faire `git pull` sur `main` et `git merge main` sur dev.
+
+## 6. Points encore à vérifier
+
+* Que la version PI 1.9.3 tourne sur une vraie installation 1.9.3 ou 1.8.9-3 (elle n'a été validée
+  qu'en simulation).
+* Langue : que la détection de la langue du système fonctionne sur chaque système (Linux, macOS,
+  Windows). Si elle se trompe, le menu *Langue / Language* corrige et mémorise le choix.

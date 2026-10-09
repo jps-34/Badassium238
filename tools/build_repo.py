@@ -33,10 +33,11 @@ PACKAGES = [
         "suffix": "PI194",
         "version": "1.9.4:1.9.99",
         "title": "Badassium238 {v} (PixInsight 1.9.4 and later)",
-        "desc": "Breaks the SII/Ha two-colour look of SHO images: finds which emission lines end up "
-                "with the same hue, then gives each line its own colour (SII red, Ha gold, OIII blue) "
-                "by a hue-only rotation at constant luminance, with live preview. The original image is "
-                "never modified. Installs under Script > Utilities > Badassium238.",
+        "desc": "Breaks the two-colour look of SHO images: finds which emission lines end up with the "
+                "same hue, then gives each line its own colour (for example SII red, Ha gold, OIII blue) "
+                "by a hue-only rotation at constant luminance, with live preview and optional palette "
+                "presets. English or French interface. The original image is never modified. "
+                "Installs under Script > Utilities > Badassium238.",
     },
     {
         "script": "scripts/legacy/Badassium238_PI193.js",

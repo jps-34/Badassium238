@@ -5,17 +5,17 @@
       <p>Add https://jps-34.github.io/Badassium238/ under Resources &gt; Updates &gt; Manage Repositories.</p>
    </description>
    <platform os="all" arch="noarch" version="1.9.4:1.9.99">
-      <package fileName="Badassium238-1.0.3-PI194.zip" sha1="be0432cdc5454e978aebbbe723a756970fdc01c0" type="script" releaseDate="20261005" serverURL="https://jps-34.github.io/Badassium238/">
-         <title>Badassium238 1.0.3 (PixInsight 1.9.4 and later)</title>
+      <package fileName="Badassium238-1.1.0-PI194.zip" sha1="505fd0b3b1ca873054a66eb8770fe1a991645174" type="script" releaseDate="20261009" serverURL="https://jps-34.github.io/Badassium238/">
+         <title>Badassium238 1.1.0 (PixInsight 1.9.4 and later)</title>
          <description>
-            <p>Breaks the SII/Ha two-colour look of SHO images: finds which emission lines end up with the same hue, then gives each line its own colour (SII red, Ha gold, OIII blue) by a hue-only rotation at constant luminance, with live preview. The original image is never modified. Installs under Script &gt; Utilities &gt; Badassium238.</p>
+            <p>Breaks the two-colour look of SHO images: finds which emission lines end up with the same hue, then gives each line its own colour (for example SII red, Ha gold, OIII blue) by a hue-only rotation at constant luminance, with live preview and optional palette presets. English or French interface. The original image is never modified. Installs under Script &gt; Utilities &gt; Badassium238.</p>
             <p>Copyright (c) 2026 Jacques Pouyaud. MIT License. Source: https://github.com/jps-34/Badassium238</p>
          </description>
       </package>
    </platform>
    <platform os="all" arch="noarch" version="1.8.9-3:1.9.3">
-      <package fileName="Badassium238-1.0.3-PI193.zip" sha1="efd3d9c9702d0733381e2f37b8d19a2f6c5c1aeb" type="script" releaseDate="20261005" serverURL="https://jps-34.github.io/Badassium238/">
-         <title>Badassium238 1.0.3 (PixInsight 1.9.3 and earlier)</title>
+      <package fileName="Badassium238-1.1.0-PI193.zip" sha1="0f67da23eea132efd76c04ca98cbfb7af11b104d" type="script" releaseDate="20261009" serverURL="https://jps-34.github.io/Badassium238/">
+         <title>Badassium238 1.1.0 (PixInsight 1.9.3 and earlier)</title>
          <description>
             <p>Same tool for the legacy JavaScript engine of PixInsight 1.9.3 and earlier. Installs under Script &gt; Utilities &gt; Badassium238 PI193.</p>
             <p>Copyright (c) 2026 Jacques Pouyaud. MIT License. Source: https://github.com/jps-34/Badassium238</p>
