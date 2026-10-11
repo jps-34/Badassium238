@@ -47,37 +47,44 @@ et [Update repositories](https://pixinsight.com/doc/docs/PIRepositoryReference/P
 `main` = la production : GitHub Pages sert `docs/` depuis `main`, donc tout ce qui arrive sur `main`
 part chez les utilisateurs PixInsight. Une nouvelle version va d'abord sur `dev`.
 
-Mettre une nouvelle version sur dev (exemple avec le zip de la 1.1.0) :
+**Seule source à modifier : `scripts/Badassium238.js`** (V8, PixInsight 1.9.4 et plus).
+`scripts/legacy/Badassium238_PI193.js` est la 1.1.0 figée pour PixInsight 1.8.9-3 à 1.9.3 : on n'y
+touche plus, PixInsight retire ce moteur. `docs/` (zips, empreintes, `updates.xri`) est généré par
+`python3 tools/build_repo.py --user jps-34` ; il garde automatiquement le paquet 1.1.0 pour la plage
+1.8.9-3 à 1.9.3 et le paquet courant pour 1.9.4 et plus.
+
+Mettre une nouvelle version sur dev (exemple avec le zip de la 1.2.0) :
 
 ```bash
-cd ~/Badassium238
-git switch dev                 # la première fois : git switch -c dev
+cd <dossier du dépôt local>/Badassium238
+git switch dev
 git rm -rq .
-unzip -o <dossier de téléchargement>/Badassium238-v1.1.0.zip -d /tmp/b238
+unzip -o <dossier de téléchargement>/Badassium238-v1.2.0.zip -d /tmp/b238
 cp -a /tmp/b238/Badassium238/. .
 git add -A
-git commit -m "Badassium238 1.1.0"
-git push -u origin dev
+git status                     # vérifier la liste avant de valider
+git commit -m "Badassium238 1.2.0"
+git push
 ```
 
 Tester dans PixInsight : *Script > Execute Script File*, choisir
-`~/Badassium238/scripts/Badassium238.js`. Le script tourne sans être installé, la version de prod
-reste en place.
+`scripts/Badassium238.js` dans le dépôt local. Le script tourne sans être installé, la version de
+prod reste en place.
 
 Passer en prod une fois validée :
 
 ```bash
 git switch main
 git merge dev
-git tag -a v1.1.0 -m "Badassium238 1.1.0"
+git tag -a v1.2.0 -m "Badassium238 1.2.0"
 git push origin main --tags
 git switch dev
 ```
 
 Puis, dans PixInsight, *Resources > Updates > Check for Updates*.
 
-Avec la signature (plus tard), l'ordre compte : signer les deux `.js` avec **CodeSign**, lancer
-`python3 tools/build_repo.py --user jps-34`, signer `docs/updates.xri` en dernier, puis commit.
+Avec la signature (plus tard), l'ordre compte : signer `scripts/Badassium238.js` avec **CodeSign**,
+lancer `python3 tools/build_repo.py --user jps-34`, signer `docs/updates.xri` en dernier, puis commit.
 
 ## 4. Versions et historique
 
@@ -101,7 +108,7 @@ sur le site dans la branche `main` est publiée immédiatement. Pour un script, 
 
 ## 6. Points encore à vérifier
 
-* Que la version PI 1.9.3 tourne sur une vraie installation 1.9.3 ou 1.8.9-3 (elle n'a été validée
-  qu'en simulation).
+* Que la version 1.1.0 pour PI 1.9.3 tourne sur une vraie installation 1.9.3 ou 1.8.9-3 (elle n'a
+  été validée qu'en simulation).
 * Langue : que la détection de la langue du système fonctionne sur chaque système (Linux, macOS,
   Windows). Si elle se trompe, le menu *Langue / Language* corrige et mémorise le choix.

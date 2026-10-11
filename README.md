@@ -2,8 +2,8 @@
 
 **A PixInsight script that gives each emission line its own colour in SHO images.**
 SII red, Ha gold, OIII blue, instead of the usual orange and blue. Only the hue moves:
-luminance, detail and noise are left exactly as they were. An optional palette pass can then
-recolour the separated lines (true wavelength colours, red and teal, soft mineral tones...).
+luminance, detail and noise are left exactly as they were. Palette presets can also recolour the
+separated lines (true wavelength colours, red and teal, soft mineral tones...).
 
 *Version française : [README.fr.md](README.fr.md)*
 
@@ -23,16 +23,20 @@ narrowband data to find out which line dominates where, then separates them.
 
 ## What it does
 
-1. **Pass 1, diagnosis.** Reads the three linear starless masters (SII, Ha, OIII) and measures, area
-   by area, how much each line contributes. It then checks which pairs of lines end up with the same
-   hue in your final image. All three pairs are tested (SII/Ha, SII/OIII, Ha/OIII), not just SII/Ha.
-2. **Pass 2, separation.** Proposes a target colour for each line, for example SII toward red and Ha
-   toward gold. Strength, tolerance and saturation can be adjusted per line, with a live preview.
-3. **Pass 3, palette (cosmetic, optional).** Once the lines are separated, each colour family can be
-   moved as a whole to the hue of a palette: presets or your own hues.
-4. **Apply.** Rotates the hue only, pixel by pixel, guided by smooth line maps (no hard edges).
-   Luminance is kept exactly, and a guard prevents any channel from clipping. The result is a new
-   image `<id>_mix`; the original is never modified.
+1. **Analysis.** Reads the three linear starless masters (SII, Ha, OIII) and measures, area by area,
+   how much each line contributes and where one line is stronger than usual compared with its
+   partner. It then checks which pairs of lines end up with the same hue in your final image (all
+   three pairs are tested), measures the current colour of each line, and tells you when that colour
+   is undefined (a white core, for instance).
+2. **Proposal.** Suggests a target colour for each line: the current colour for lines that are fine,
+   and a split for the pairs that are merged or only partly separated, for example SII toward red
+   and Ha toward gold. Palette presets fill the targets differently.
+3. **Colours.** For each line: target, strength, tolerance, saturation, with a live preview and fine
+   sliders. One global control, *Mixed areas*, decides whether the areas where two lines are at their
+   usual ratio keep their colour (subtle split) or follow the targets (palette).
+4. **Apply.** Rotates the hue only, pixel by pixel, guided by smooth line maps. Luminance is kept
+   exactly, a pixel never goes past its target, and a guard prevents any channel from clipping. The
+   result is a new image `<id>_mix`; the original is never modified.
 
 **The linear masters are only used for detection.** They tell the script where the lines overlap
 and which one dominates. They are never modified, and their brightness does not end up in the
@@ -45,13 +49,17 @@ with a measured luminance change of 0 and no newly clipped pixel.
 
 | File | PixInsight |
 |---|---|
-| `scripts/Badassium238.js` | 1.9.4 and later (V8 JavaScript engine) |
-| `scripts/legacy/Badassium238_PI193.js` | 1.8.9-3 to 1.9.3 (legacy engine, less field-tested) |
+| `scripts/Badassium238.js` (1.2.0) | 1.9.4 and later (V8 JavaScript engine) |
+| `scripts/legacy/Badassium238_PI193.js` (1.1.0, frozen) | 1.8.9-3 to 1.9.3 (legacy engine) |
+
+PixInsight is retiring its legacy JavaScript engine (it is already absent on macOS Apple Silicon),
+so from version 1.2 Badassium238 is developed for the V8 engine only. The 1.1.0 version stays
+available for PixInsight 1.9.3 and earlier, through the same update repository.
 
 Inputs, all pixel-aligned (no crop or rotation between them):
 
-* the **three linear starless masters** SII, Ha and OIII (grayscale, not stretched), used only to
-  locate each line;
+* the **three linear starless masters** SII, Ha and OIII (grayscale, not stretched, 32-bit float
+  preferred), used only to locate each line;
 * the **final stretched starless RGB image** whose colours you want to change.
 
 ## Language
@@ -59,11 +67,9 @@ Inputs, all pixel-aligned (no crop or rotation between them):
 The interface is available in **English and French**. PixInsight itself is not localised
 ([PixInsight FAQ](https://pixinsight.com/faq/): "We currently have no plans to publish localized
 versions of PixInsight"), so the script cannot follow a PixInsight language setting. On first run it
-uses the language of the system (environment variables `LANGUAGE`, `LC_ALL`, `LC_MESSAGES`, `LANG`,
-then the system locale), and English otherwise.
-
-To switch, use the **Langue / Language** menu at the top of the dialog. The dialog reopens at once
-in the chosen language, keeping the analysis and all settings, and the choice is remembered.
+uses the language of the system, and English otherwise. The **Langue / Language** menu at the top of
+the dialog switches at any time: the dialog reopens at once, keeping the analysis and all settings,
+and the choice is remembered.
 
 ## Installation
 
@@ -89,46 +95,46 @@ Badassium238 is the **last colour step**: finish the stretch, curves and colour 
 starless image first, run Badassium238, then put the stars back. Curves applied afterwards would
 move the hues again.
 
-1. Select the SII, Ha and OIII masters and the final image, check the R, G, B order (SHO by default).
-2. **Analyse**: reads the images and shows the diagnosis table. A pair marked *merged* is causing
-   the two-colour look.
-3. **Proposal**: sets proposed targets, strengths and tolerances.
-4. Adjust while watching the preview; tick **Before** to compare.
-5. Optionally, pick a palette in **Pass 3**.
-6. **Apply**: creates `<id>_mix` at full resolution. The console reports the settings, the share of
+1. **Images**: select the SII, Ha and OIII masters and the final image.
+2. **Analyse**: reads the images, shows the diagnosis table and a one-line summary, and applies
+   the proposal. The console gives the details.
+3. **Colours**: adjust while watching the preview, tick **Before** to compare, or pick a palette in
+   the *Preset* menu. *Families* shows which line each area belongs to.
+4. **Apply**: creates `<id>_mix` at full resolution. The console reports the settings, the share of
    pixels changed, the maximum luminance difference and the number of newly clipped pixels.
 
 Dragging the *New Instance* triangle to the workspace saves all settings in a process icon.
+**Reset** puts every setting back to its default, keeping the images.
+
+The script remembers its settings from one session to the next. When settings that are not the
+defaults are restored (advanced settings, manual backgrounds or weights, custom targets), a notice
+says so at the top of the dialog until you click *Reset*.
 
 ## Settings
 
-### Pass 2, per line
+### Colours
 
 | Setting | Meaning |
 |---|---|
-| **Target** | Target hue in degrees: 0 red, 30 orange, 50 gold, 60 yellow, 120 green, 180 cyan, 240 blue, 300 magenta. Leaving it on the current colour changes nothing. |
-| **Strength** | How far the areas of this line move toward the target. 0 = line inactive, 1 = part of the way, 2 to 3 = nearly all the way. |
+| **Preset** | *Proposal* (default): targets on the current colours, split of the merged or partly separated pairs. The other presets fill the targets with a palette. *Custom*: your own targets (automatic as soon as you edit one). |
+| **Mixed areas** | Areas where both lines of a pair are at their usual ratio. 0 = they keep their colour, only the areas where one line is stronger than usual move toward its target (subtle split, as in the proposal). 1 = they take the colour halfway between the two targets (the whole pair is recoloured, as with a palette). |
+
+### Per line
+
+| Setting | Meaning |
+|---|---|
+| **Target** | Target hue in degrees: 0 red, 30 orange, 50 gold, 60 yellow, 120 green, 180 cyan, 240 blue, 300 magenta. The swatch shows the colour. Leaving it on the current colour changes nothing. |
+| **Strength** | 0 = line inactive, 1 = the areas of this line go all the way to the target, in between = part of the way. A pixel never goes past its target. |
 | **Tolerance** | Which current colours are allowed to move, in degrees around the line's current colour. This is what protects areas of another colour (e.g. a blue OIII nebula while you work on SII and Ha). |
 | **Saturation** | Colour intensity in the areas of this line: 1 = unchanged, 1.3 = 30 % stronger, 0.8 = softer. Luminance does not change. |
-| **Line map** | Opens the maps used: red = where SII is stronger than usual, green = Ha, blue = OIII, black = nothing will move. |
 
-**Fine sliders.** Under each main slider, a second slider marked *fine ±* zooms around the current
-value for precise adjustment: ±15° for targets and palette hues, ±0.3 for strength, ±10° for
-tolerance, ±0.2 for saturation. It re-centres when you release the mouse. Values can also be typed
-in the boxes.
+Under each slider, a *fine ±* slider zooms around the current value for precise adjustment
+(±15° for targets, ±0.1 for strength, ±10° for tolerance, ±0.2 for saturation).
 
-Advanced settings (line smoothing, map smoothing, colour smoothing, signal threshold, sky
-backgrounds, SII/OIII weights) are computed automatically and rarely need changing. Every control
-has a tooltip.
+A line whose current colour cannot be measured (hue concentration below 0.35, typically a white
+or grey core) is reported as *undefined* and left inactive by the proposal and the presets.
 
-### Pass 3, palette
-
-| Setting | Meaning |
-|---|---|
-| **Preset** | *None* (pass 3 off, the default), a preset palette, or *Custom*. Editing a hue switches to Custom. |
-| **SII, Ha, OIII** | Palette hue for the colour family of each line, in degrees, with a colour swatch. |
-| **Saturation** | Saturation of the palette in the signal areas: below 1 softer, above 1 stronger. |
-| **Intensity** | 1 = families moved onto the palette hues, 0.5 = halfway, 0 = no effect. |
+### Presets
 
 | Preset | SII | Ha | OIII | Saturation |
 |---|---|---|---|---|
@@ -143,16 +149,15 @@ converted to sRGB): SII 672.4 nm and Ha 656.3 nm both give a red at about 355°,
 green-teal at about 160°. Since SII and Ha then share the same red, this preset gives up the SII/Ha
 separation on purpose: it shows what the eye would see, not where each element glows.
 
-How pass 3 works: the colour of each family after pass 2 is measured (circular mean, weighted by
-signal), then the whole family is rotated so that its centre lands on the palette hue. Half of the
-colour variations inside a family are kept, so the image does not turn flat. A pixel belongs to a
-family according to the line proportions; for a merged pair, the pair's share is split between its
-two lines with the same line maps as pass 2. Pixels whose colour is far from their family's colour
-(more than 120°) are moved progressively less, so no isolated pixel can jump to the opposite colour.
-Nothing moves in the sky background.
+### Advanced settings
 
-Limits: pass 3 can only recolour what pass 2 has separated. With *Ha red, SII gold*, the swap is
-clear where one line strongly dominates; in mixed areas the result stays close to orange.
+*Final image built as* (SHO by default: which line is in red, green and blue; used by the proposal
+for the direction of a split), *proposed split* (25° on either side of the common colour; Ha is not
+pushed beyond 48°, which turns yellow-green on screen), *split contrast*, *family sharpness*,
+*tightening* (reduces the hue variations inside a family, mostly useful with a palette on a wide
+family), smoothing, signal threshold, sky backgrounds and SII/OIII weights. All are computed
+automatically or have validated defaults; the console says `(auto)` or `(manual)` after the
+backgrounds and weights.
 
 ### Tips from the author's tests
 
@@ -166,11 +171,13 @@ clear where one line strongly dominates; in mixed areas the result stays close t
 
 ## How it works, in short
 
-Colours are handled in the Rec. 709 YCbCr space. For each pixel, the chroma vector (Cb, Cr) is
-rotated toward the target of each line, weighted by the line map, the strength and the closeness of
-the current colour to that line's colour family. If the new colour falls outside the displayable
-range, its saturation is reduced just enough so that no channel exceeds max(0.99, its original
-value).
+Each pixel belongs to the three colour families (one per line) according to the levelled line
+proportions; a merged or partly separated pair is shared between its two lines where one is
+stronger than usual (character maps). Colours are handled in the Rec. 709 YCbCr space: the chroma
+vector (Cb, Cr) of each family is rotated from its measured centre toward its target, weighted by
+the family membership, the strength, the signal and the closeness of the smoothed colour to the
+family's colour (tolerance). If the new colour falls outside the displayable range, its saturation
+is reduced just enough so that no channel exceeds max(0.99, its original value).
 
 Luminance is Y = 0.2126 R + 0.7152 G + 0.0722 B (Rec. 709 coefficients, fixed in the code) and is
 kept exactly. PixInsight's own luminance uses the coefficients of the image's RGB working space
@@ -191,5 +198,6 @@ Bug reports and suggestions are welcome as GitHub issues.
   legacy port (killerciao, lucasssvaz).
 * The name is a nod to the element Tony Stark synthesises in *Iron Man 2*, nicknamed "Badassium".
 
-*Code written by Claude (Anthropic), under the direction of Jacques Pouyaud, who defined
-the need, tested it on his own data and validated the results.*
+*Code written by Claude (Anthropic), under
+the direction of Jacques Pouyaud, who defined the need, tested it on his own data and validated
+the results.*
