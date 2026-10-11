@@ -1389,7 +1389,8 @@ function buildTips()
       "(sauf resserrement).</p>",
    force: "<p><b>Force</b> : 0 = raie inactive, 1 = les zones de cette raie vont jusqu'à la cible, entre les " +
       "deux = en partie. Un pixel ne dépasse jamais sa cible.</p>",
-   tol: "<p><b>Tolérance</b> (degrés) : quelles couleurs actuelles ont le droit de bouger. Seuls les pixels dont " +
+   tol: "<p><b>Tolérance</b> (degrés) : un filtre sur la couleur actuelle. Le script sait par les masters quels pixels " +
+      "appartiennent à une raie ; la tolérance dit en plus lesquels ont le droit de bouger selon leur couleur. Seuls les pixels dont " +
       "la couleur lissée est à moins de cette distance de la couleur actuelle de la raie sont concernés, avec " +
       "un effet qui s'atténue avec la distance. C'est ce qui protège les zones d'une autre couleur. " +
       "180 = sans limite : toute la famille bouge (réglage des palettes).</p>",
@@ -1469,7 +1470,8 @@ function buildTips()
       "(except tightening).</p>",
    force: "<p><b>Strength</b>: 0 = line inactive, 1 = the areas of this line go all the way to the target, in " +
       "between = part of the way. A pixel never goes past the target.</p>",
-   tol: "<p><b>Tolerance</b> (degrees): which current colours are allowed to move. Only pixels whose smoothed " +
+   tol: "<p><b>Tolerance</b> (degrees): a filter on the current colour. The masters tell the script which pixels " +
+      "belong to a line; the tolerance also says which of them may move, according to their colour. Only pixels whose smoothed " +
       "colour is within this distance of the line's current colour are affected, with an effect that fades " +
       "with distance. This is what protects areas of another colour. 180 = no limit: the whole family " +
       "moves (palette setting).</p>",
@@ -1754,6 +1756,7 @@ constructor()
       {
          TP.preset = PRESET_CUSTOM;
          self.presetCombo.currentItem = PRESET_CUSTOM;
+         self.updateHint();
       }
       self.updateSwatches();
       self.schedulePreview();
@@ -1894,8 +1897,29 @@ constructor()
    this.colourHint = new Label( this );
    this.colourHint.useRichText = true;
    this.colourHint.wordWrapping = true;
-   this.colourHint.text = L( "<i>Cible, force, tolérance et saturation de chaque raie : sous l'aperçu.</i>",
-                             "<i>Target, strength, tolerance and saturation of each line: below the preview.</i>" );
+   this.updateHint = function()
+   {
+      var t;
+      if ( TP.preset == PRESET_PROPOSAL )
+         t = L( "<i>Proposition : tolérance mesurée sur l'image. Seuls les pixels dont la couleur est proche de celle " +
+                "de leur raie bougent ; les autres sont protégés.</i>",
+                "<i>Proposal: tolerance measured on the image. Only pixels whose colour is close to their line's colour " +
+                "move; the others are protected.</i>" );
+      else if ( TP.preset == PRESET_CUSTOM )
+         t = L( "<i>Personnalisée : tes cibles. Tolérance : plus elle est basse, plus les zones de couleur différente " +
+                "sont protégées (180 = sans limite).</i>",
+                "<i>Custom: your targets. Tolerance: the lower it is, the more areas of a different colour are " +
+                "protected (180 = no limit).</i>" );
+      else
+         t = L( "<i>Palette : tolérance à 180° (sans limite), toute la famille de chaque raie prend la couleur de la " +
+                "palette. Baisser la tolérance d'une raie garde la couleur d'origine des zones qui s'écartent de sa " +
+                "couleur : rendu plus nuancé.</i>",
+                "<i>Palette: tolerance at 180° (no limit), the whole family of each line takes the palette colour. " +
+                "Lowering a line's tolerance keeps the original colour of the areas that differ from its colour: " +
+                "more nuanced result.</i>" );
+      self.colourHint.text = t + L( " <i>Réglages de chaque raie : sous l'aperçu.</i>", " <i>Per-line settings: below the preview.</i>" );
+   };
+   this.colourHint.text = "";
    this.colourGroup.sizer.add( this.colourHint );
 
    // --- Avancé ----------------------------------------------------------------
@@ -2285,6 +2309,7 @@ constructor()
       for ( var key in self.fine )
          self.fine[key].recenter();
       self.presetCombo.currentItem = TP.preset;
+      self.updateHint();
       for ( var key in self.checks )
          self.checks[key].checked = TP[key];
       self.orderCombo.currentItem = TP.order;
