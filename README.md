@@ -125,7 +125,7 @@ says so at the top of the dialog until you click *Reset*.
 |---|---|
 | **Target** | Target hue in degrees: 0 red, 30 orange, 50 gold, 60 yellow, 120 green, 180 cyan, 240 blue, 300 magenta. The swatch shows the colour. Leaving it on the current colour changes nothing. |
 | **Strength** | 0 = line inactive, 1 = the areas of this line go all the way to the target, in between = part of the way. A pixel never goes past its target. |
-| **Tolerance** | Which current colours are allowed to move, in degrees around the line's current colour. This is what protects areas of another colour (e.g. a blue OIII nebula while you work on SII and Ha). |
+| **Tolerance** | Which current colours are allowed to move, in degrees around the line's current colour (180 = no limit, used by the palettes). This is what protects areas of another colour (e.g. a blue OIII nebula while you work on SII and Ha). |
 | **Saturation** | Colour intensity in the areas of this line: 1 = unchanged, 1.3 = 30 % stronger, 0.8 = softer. Luminance does not change. |
 
 Under each slider, a *fine ±* slider zooms around the current value for precise adjustment

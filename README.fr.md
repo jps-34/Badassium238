@@ -130,7 +130,7 @@ avertissement le dit en haut du dialogue, jusqu'à ce que tu cliques sur *Réini
 |---|---|
 | **Cible** | Teinte visée en degrés : 0 rouge, 30 orange, 50 or, 60 jaune, 120 vert, 180 cyan, 240 bleu, 300 magenta. La pastille montre la couleur. La laisser sur la couleur actuelle ne change rien. |
 | **Force** | 0 = raie inactive, 1 = les zones de cette raie vont jusqu'à la cible, entre les deux = en partie. Un pixel ne dépasse jamais sa cible. |
-| **Tolérance** | Quelles couleurs actuelles ont le droit de bouger, en degrés autour de la couleur actuelle de la raie. C'est ce qui protège les zones d'une autre couleur (par exemple une nébuleuse OIII bleue pendant qu'on règle SII et Ha). |
+| **Tolérance** | Quelles couleurs actuelles ont le droit de bouger, en degrés autour de la couleur actuelle de la raie (180 = sans limite, utilisé par les palettes). C'est ce qui protège les zones d'une autre couleur (par exemple une nébuleuse OIII bleue pendant qu'on règle SII et Ha). |
 | **Saturation** | Intensité de la couleur dans les zones de cette raie : 1 = inchangée, 1,3 = 30 % plus franche, 0,8 = plus douce. La luminosité ne change pas. |
 
 Sous chaque curseur, un curseur *fin ±* fait un zoom autour de la valeur actuelle pour un réglage

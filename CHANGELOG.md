@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 (2026-10-11)
+* Tolerance now goes up to 180°, which means no limit: the whole colour family moves.
+* Palette presets set the tolerance to 180°, as the 1.1 palette pass did. In 1.2.0 palettes were
+  limited by the tolerance, so a family whose colour is spread out (OIII on the author's Cassiopeia
+  field) barely moved. Proposal results are unchanged.
+
 ## 1.2.0 (2026-10-11)
 * **Rewritten on a single colour engine.** The pass 2 / pass 3 split is gone: per line, Target,
   Strength (0 to 1), Tolerance and Saturation, plus one global control, *Mixed areas* (0 = areas at

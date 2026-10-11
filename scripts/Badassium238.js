@@ -7,12 +7,13 @@
    original image. Interface in English or French.
 
 /*
- * Badassium238.js  v1.2.0
+ * Badassium238.js  v1.2.1
  * Copyright (c) 2026 Jacques Pouyaud. MIT License (see LICENSE).
  * Code écrit par Claude (Anthropic),
  * sous la direction de Jacques Pouyaud.
  * https://github.com/jps-34/Badassium238
  *
+ * v1.2.1 : tolérance jusqu'à 180° (= sans limite), mise par les palettes comme en 1.1.
  * v1.2.0 : réécriture. Un seul moteur de couleur (cible par raie, appartenance
  *   aux familles, resserrement des variations), proposition continue, couleurs
  *   indéterminées détectées, mesure du signal des masters, réglages mémorisés
@@ -48,7 +49,7 @@
  */
 
 var TITLE = "Badassium238";
-var VERSION = "1.2.0";
+var VERSION = "1.2.1";
 var LANG_KEY = "Badassium238/language";
 var LANG = "en";
 var TIPS = {};
@@ -1015,8 +1016,7 @@ function applyPreset( p, idx, ana )
       p[T_KEYS[i]] = e[2 + i];
       p[F_KEYS[i]] = ( ana != null && !ana.famOk[i] ) ? 0 : 1;
       p[SAT_KEYS[i]] = e[5];
-      if ( ana != null )
-         p[W_KEYS[i]] = Math.max( p[W_KEYS[i]], proposedTolerance( ana, i ) );
+      p[W_KEYS[i]] = 180;     // palette : toute la famille tourne (comme la passe 3 de la 1.1)
    }
    p.tight = e[6];
    p.mixed = e[7];
@@ -1145,7 +1145,7 @@ function mixPixel( r, g, b, c0, c1, c2, ys, cbs, crs, P, out, st, sg, p0, p1, p2
       var Li = P[i];
       if ( !Li.on || w[i] <= 0 )
          continue;
-      var close = 1 - smooth01( Math.abs( wrapDeg( hs - Li.famDeg ) ) / Li.tol );
+      var close = Li.tol >= 180 ? 1 : 1 - smooth01( Math.abs( wrapDeg( hs - Li.famDeg ) ) / Li.tol );
       if ( close <= 0 )
          continue;
       var a = w[i] * close * ks;
@@ -1391,7 +1391,8 @@ function buildTips()
       "deux = en partie. Un pixel ne dépasse jamais sa cible.</p>",
    tol: "<p><b>Tolérance</b> (degrés) : quelles couleurs actuelles ont le droit de bouger. Seuls les pixels dont " +
       "la couleur lissée est à moins de cette distance de la couleur actuelle de la raie sont concernés, avec " +
-      "un effet qui s'atténue avec la distance. C'est ce qui protège les zones d'une autre couleur.</p>",
+      "un effet qui s'atténue avec la distance. C'est ce qui protège les zones d'une autre couleur. " +
+      "180 = sans limite : toute la famille bouge (réglage des palettes).</p>",
    sat: "<p><b>Saturation</b> de la couleur dans les zones de cette raie : 1 = inchangée, 1,3 = 30 % plus " +
       "franche, 0,8 = plus douce. La luminosité ne change pas.</p>",
    fine: "<p><b>Curseur fin</b> : zoom autour de la valeur du curseur du dessus, pour un réglage précis. Il se " +
@@ -1470,7 +1471,8 @@ function buildTips()
       "between = part of the way. A pixel never goes past the target.</p>",
    tol: "<p><b>Tolerance</b> (degrees): which current colours are allowed to move. Only pixels whose smoothed " +
       "colour is within this distance of the line's current colour are affected, with an effect that fades " +
-      "with distance. This is what protects areas of another colour.</p>",
+      "with distance. This is what protects areas of another colour. 180 = no limit: the whole family " +
+      "moves (palette setting).</p>",
    sat: "<p><b>Saturation</b> of the colour in the areas of this line: 1 = unchanged, 1.3 = 30 % stronger, " +
       "0.8 = softer. Luminance does not change.</p>",
    fine: "<p><b>Fine slider</b>: a zoom around the value of the slider above, for precise adjustment. It " +
@@ -2056,7 +2058,7 @@ constructor()
       grp.sizer.add( this.makeFine( T_KEYS[i], 15, 1, edit, lw2 ) );
       grp.sizer.add( this.makeNumeric( L( "Force :", "Strength:" ), F_KEYS[i], 0, 1, 2, TIPS.force, edit, lw2 ) );
       grp.sizer.add( this.makeFine( F_KEYS[i], 0.1, 2, edit, lw2 ) );
-      grp.sizer.add( this.makeNumeric( L( "Tolérance (°) :", "Tolerance (°):" ), W_KEYS[i], 5, 120, 0, TIPS.tol, edit, lw2 ) );
+      grp.sizer.add( this.makeNumeric( L( "Tolérance (°) :", "Tolerance (°):" ), W_KEYS[i], 5, 180, 0, TIPS.tol, edit, lw2 ) );
       grp.sizer.add( this.makeFine( W_KEYS[i], 10, 0, edit, lw2 ) );
       grp.sizer.add( this.makeNumeric( L( "Saturation :", "Saturation:" ), SAT_KEYS[i], 0.5, 2, 2, TIPS.sat, edit, lw2 ) );
       grp.sizer.add( this.makeFine( SAT_KEYS[i], 0.2, 2, edit, lw2 ) );
