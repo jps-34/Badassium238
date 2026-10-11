@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.2 (2026-10-11)
+* New preset **Copper and teal** (SII 12°, Ha 32°, OIII 185°, saturation 0.85): copper filaments,
+  amber cores, teal OIII, bolder than *Mineral*.
+* Palettes: each family is centred on its target and keeps half of its hue spread on both sides, as
+  the 1.1 palette pass did. In 1.2.0 and 1.2.1 the "never past the target" rule of the proposal also
+  applied to palettes, so the half of a family lying between its centre and the target collapsed onto
+  the target and the family drifted to one side (OIII blue instead of teal-green with *Mineral* on the
+  author's Cassiopeia field). Proposal results are unchanged.
+* Settings saved by 1.2.x are kept: *Custom* is recognised despite the new preset index; a process
+  icon from 1.2.x is read the same way.
+
 ## 1.2.1 (2026-10-11)
 * Tolerance now goes up to 180°, which means no limit: the whole colour family moves.
 * Palette presets set the tolerance to 180°, as the 1.1 palette pass did. In 1.2.0 palettes were

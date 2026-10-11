@@ -3,7 +3,7 @@
 **A PixInsight script that gives each emission line its own colour in SHO images.**
 SII red, Ha gold, OIII blue, instead of the usual orange and blue. Only the hue moves:
 luminance, detail and noise are left exactly as they were. Palette presets can also recolour the
-separated lines (true wavelength colours, red and teal, soft mineral tones...).
+separated lines (true wavelength colours, red and teal, soft mineral tones, copper and teal...).
 
 *Version française : [README.fr.md](README.fr.md)*
 
@@ -35,7 +35,9 @@ narrowband data to find out which line dominates where, then separates them.
    sliders. One global control, *Mixed areas*, decides whether the areas where two lines are at their
    usual ratio keep their colour (subtle split) or follow the targets (palette).
 4. **Apply.** Rotates the hue only, pixel by pixel, guided by smooth line maps. Luminance is kept
-   exactly, a pixel never goes past its target, and a guard prevents any channel from clipping. The
+   exactly and a guard prevents any channel from clipping. With the proposal a pixel never goes past
+   its target; with a palette each family is centred on its target and keeps half of its spread on
+   both sides. The
    result is a new image `<id>_mix`; the original is never modified.
 
 **The linear masters are only used for detection.** They tell the script where the lines overlap
@@ -49,7 +51,7 @@ with a measured luminance change of 0 and no newly clipped pixel.
 
 | File | PixInsight |
 |---|---|
-| `scripts/Badassium238.js` (1.2.0) | 1.9.4 and later (V8 JavaScript engine) |
+| `scripts/Badassium238.js` (1.2.2) | 1.9.4 and later (V8 JavaScript engine) |
 | `scripts/legacy/Badassium238_PI193.js` (1.1.0, frozen) | 1.8.9-3 to 1.9.3 (legacy engine) |
 
 PixInsight is retiring its legacy JavaScript engine (it is already absent on macOS Apple Silicon),
@@ -124,7 +126,7 @@ says so at the top of the dialog until you click *Reset*.
 | Setting | Meaning |
 |---|---|
 | **Target** | Target hue in degrees: 0 red, 30 orange, 50 gold, 60 yellow, 120 green, 180 cyan, 240 blue, 300 magenta. The swatch shows the colour. Leaving it on the current colour changes nothing. |
-| **Strength** | 0 = line inactive, 1 = the areas of this line go all the way to the target, in between = part of the way. A pixel never goes past its target. |
+| **Strength** | 0 = line inactive, 1 = the areas of this line go all the way to the target, in between = part of the way. With the proposal a pixel never goes past its target; with a palette the family spreads on both sides of the target. |
 | **Tolerance** | Which current colours are allowed to move, in degrees around the line's current colour (180 = no limit, used by the palettes). This is what protects areas of another colour (e.g. a blue OIII nebula while you work on SII and Ha). |
 | **Saturation** | Colour intensity in the areas of this line: 1 = unchanged, 1.3 = 30 % stronger, 0.8 = softer. Luminance does not change. |
 
@@ -143,6 +145,7 @@ or grey core) is reported as *undefined* and left inactive by the proposal and t
 | True colours (wavelengths) | 355° | 355° | 160° | 1 |
 | Natural red / teal | 345° | 355° | 185° | 0.85 |
 | Mineral (soft) | 20° | 38° | 205° | 0.55 |
+| Copper and teal | 12° | 32° | 185° | 0.85 |
 
 *True colours* are computed from the emission wavelengths (CIE 1931 colour matching functions,
 converted to sRGB): SII 672.4 nm and Ha 656.3 nm both give a red at about 355°, OIII 500.7 nm a
@@ -163,8 +166,9 @@ backgrounds and weights.
 
 * Ha targets above about 50° drift toward yellow-green on screen. Around 40 to 48° gives gold cores.
 * SII around 5° gives clearly red filaments next to the gold Ha.
-* The script never moves a pixel past its target, so the target is the limit to set, not the
-  strength.
+* With the proposal, the script never moves a pixel past its target, so the target is the limit to
+  set, not the strength. With a palette, the family is centred on the target and keeps half of its
+  spread on both sides (tightening 0.5).
 * Stars are not handled. For star colours derived from the narrowband data, see
   [PSCM (Planck Star Color Mapping)](https://github.com/drraupach/PSCM) by Dr. Rainer Raupach,
   applied to the star image before recombining.

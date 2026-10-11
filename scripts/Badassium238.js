@@ -7,12 +7,16 @@
    original image. Interface in English or French.
 
 /*
- * Badassium238.js  v1.2.1
+ * Badassium238.js  v1.2.2
  * Copyright (c) 2026 Jacques Pouyaud. MIT License (see LICENSE).
  * Code écrit par Claude (Anthropic),
  * sous la direction de Jacques Pouyaud.
  * https://github.com/jps-34/Badassium238
  *
+ * v1.2.2 : préréglage « Cuivre et sarcelle ». Palettes : la famille garde ses écarts des
+ *   deux côtés de la cible (sans butée), comme la passe 3 de la 1.1 (en 1.2.0 et
+ *   1.2.1 l'OIII sortait bleu au lieu de turquoise-vert en Minéral). Les réglages
+ *   mémorisés par 1.2 sont repris (Personnalisée retrouvée malgré le nouvel index).
  * v1.2.1 : tolérance jusqu'à 180° (= sans limite), mise par les palettes comme en 1.1.
  * v1.2.0 : réécriture. Un seul moteur de couleur (cible par raie, appartenance
  *   aux familles, resserrement des variations), proposition continue, couleurs
@@ -49,7 +53,7 @@
  */
 
 var TITLE = "Badassium238";
-var VERSION = "1.2.1";
+var VERSION = "1.2.2";
 var LANG_KEY = "Badassium238/language";
 var LANG = "en";
 var TIPS = {};
@@ -121,6 +125,7 @@ var PRESETS = [
    [ "Vraies couleurs (longueurs d'onde)", "True colours (wavelengths)", 355, 355, 160, 1, 0.5, 1 ],
    [ "Naturel rouge / turquoise", "Natural red / teal", 345, 355, 185, 0.85, 0.5, 1 ],
    [ "Minéral (doux)", "Mineral (soft)", 20, 38, 205, 0.55, 0.5, 1 ],
+   [ "Cuivre et sarcelle", "Copper and teal", 12, 32, 185, 0.85, 0.5, 1 ],
    [ "Personnalisée", "Custom", NaN, NaN, NaN, NaN, NaN, NaN ]
 ];
 var PRESET_PROPOSAL = 0;
@@ -138,7 +143,7 @@ var DEFAULTS = {
    sharpPair: 2, sharpFam: 3,
    autoBg: true,      bgS: 0.145, bgH: 0.145, bgO: 0.145,
    autoWeights: true, kS: 2.46, kO: 6.06,
-   preset: 0, tight: 0, mixed: 0,
+   preset: 0, nPresets: PRESETS.length, tight: 0, mixed: 0,
    tS: 22, tH: 22, tO: 296,
    fS: 0, fH: 0, fO: 0,
    wS: 60, wH: 60, wO: 45,
@@ -149,7 +154,7 @@ var DEFAULTS = {
 var STR_KEYS  = [ "sId", "hId", "oId", "tId", "lastIds" ];
 var BOOL_KEYS = [ "autoBg", "autoWeights", "showAdvanced" ];
 var REAL_KEYS = [ "order", "blurLines", "blurMap", "blurColor", "split", "sigPct", "sharpPair", "sharpFam",
-                  "bgS", "bgH", "bgO", "kS", "kO", "preset", "tight", "mixed" ].concat( T_KEYS, F_KEYS, W_KEYS, SAT_KEYS );
+                  "bgS", "bgH", "bgO", "kS", "kO", "preset", "nPresets", "tight", "mixed" ].concat( T_KEYS, F_KEYS, W_KEYS, SAT_KEYS );
 // réglages dont la restauration d'une session précédente mérite un avertissement
 var NOTICE_KEYS = [ "blurLines", "blurMap", "blurColor", "split", "sigPct", "sharpPair", "sharpFam", "tight", "mixed" ];
 
@@ -176,6 +181,7 @@ function loadParameters()
       if ( Parameters.has( BOOL_KEYS[i] ) ) TP[BOOL_KEYS[i]] = Parameters.getBoolean( BOOL_KEYS[i] );
    for ( var i = 0; i < REAL_KEYS.length; ++i )
       if ( Parameters.has( REAL_KEYS[i] ) ) TP[REAL_KEYS[i]] = Parameters.getReal( REAL_KEYS[i] );
+   fixPresetIndex( Parameters.has( "nPresets" ) ? Parameters.getReal( "nPresets" ) : 7 );
 }
 
 function saveSettings()
@@ -194,9 +200,21 @@ function loadSettings()
          for ( var key in DEFAULTS )
             if ( o[key] !== undefined && typeof o[key] === typeof DEFAULTS[key] )
                TP[key] = o[key];
+         fixPresetIndex( typeof o.nPresets === "number" ? o.nPresets : 7 );   // 1.2.x : 7 préréglages
       }
    }
    catch ( e ) {}
+}
+
+// Réglages écrits par une version qui avait un autre nombre de préréglages : Personnalisée
+// (toujours le dernier) garde son sens, un index devenu invalide retombe sur la proposition.
+function fixPresetIndex( nSaved )
+{
+   if ( TP.preset == nSaved - 1 )
+      TP.preset = PRESET_CUSTOM;
+   else if ( !( TP.preset >= 0 && TP.preset < PRESET_CUSTOM ) )
+      TP.preset = PRESET_PROPOSAL;
+   TP.nPresets = PRESETS.length;
 }
 
 // Réglages restaurés qui ne sont pas ceux par défaut (hors images et cibles)
@@ -1151,14 +1169,33 @@ function mixPixel( r, g, b, c0, c1, c2, ys, cbs, crs, P, out, st, sg, p0, p1, p2
       var a = w[i] * close * ks;
       if ( Li.force > 0 )
       {
-         // rotation de la famille : (cible - centre), moins le resserrement de l'écart du pixel au centre ;
-         // un pixel ne dépasse jamais la cible (et ne bouge pas s'il est déjà au-delà)
-         var dRot = wrapRad( Li.phiT - Li.c ) - P.tight * wrapRad( phi - Li.c );
-         var toT = wrapRad( Li.phiT - phi );
-         if ( dRot * toT <= 0 )
-            dRot = 0;
-         else if ( Math.abs( dRot ) > Math.abs( toT ) )
-            dRot = toT;
+         // rotation de la famille : (cible - centre), moins le resserrement de l'écart du pixel au centre
+         var dC = wrapRad( phi - Li.c );
+         var dRot = wrapRad( Li.phiT - Li.c ) - P.tight * dC;
+         if ( P.tight > 0 )
+         {
+            // palette (resserrement > 0) : comme la passe 3 de la 1.1, la famille est centrée sur la
+            // cible et garde (1 - resserrement) de ses écarts DES DEUX CÔTÉS, sans butée à la cible
+            // (avec butée, le côté situé entre le centre et la cible s'écrase sur la cible et la
+            // famille glisse d'un côté : OIII plus bleu qu'en 1.1). Effet effacé au-delà de 120°
+            // du centre, comme en 1.1 (à 180° le sens de rotation serait indéterminé).
+            var ad = Math.abs( dC );
+            if ( ad > 2 * Math.PI / 3 )
+            {
+               var t3 = ( Math.PI - ad ) / ( Math.PI / 3 );
+               dRot *= t3 * t3 * ( 3 - 2 * t3 );
+            }
+         }
+         else
+         {
+            // proposition (sans resserrement) : un pixel ne dépasse jamais la cible
+            // (et ne bouge pas s'il est déjà au-delà)
+            var toT = wrapRad( Li.phiT - phi );
+            if ( dRot * toT <= 0 )
+               dRot = 0;
+            else if ( Math.abs( dRot ) > Math.abs( toT ) )
+               dRot = toT;
+         }
          theta += Li.force * a * dRot;
       }
       satf += a * ( Li.sat - 1 );
@@ -1375,20 +1412,22 @@ function buildTips()
    preset: "<p><b>Préréglage</b>. <b>Proposition</b> : cibles sur les couleurs actuelles, et séparation des " +
       "paires confondues ou en partie séparées. Les autres remplissent les cibles d'une palette ; " +
       "<b>Vraies couleurs</b> : teintes calculées depuis les longueurs d'onde (SII et Ha donnent le même rouge, " +
-      "OIII un vert-turquoise). <b>Personnalisée</b> : tes propres cibles (automatique dès qu'on en modifie une).</p>",
+      "OIII un vert-turquoise) ; <b>Cuivre et sarcelle</b> : filaments cuivre, cœurs ambre, OIII turquoise, " +
+      "couleurs franches. <b>Personnalisée</b> : tes propres cibles (automatique dès qu'on en modifie une).</p>",
    mixed: "<p><b>Zones mixtes</b> d'une paire de raies (SII/Ha en général) : là où les deux raies sont dans " +
       "leur rapport habituel. 0 = elles gardent leur couleur, seules les zones où une raie est plus forte que " +
       "d'habitude vont vers sa cible (séparation subtile, comme la proposition) ; 1 = elles prennent la couleur " +
       "à mi-chemin des deux cibles (toute la paire est recolorée, comme avec une palette).</p>",
    tight: "<p><b>Resserrement des teintes</b> : réduit les variations de teinte à l'intérieur d'une famille " +
-      "(0 = conservées, 1 = toute la famille prend exactement la teinte de la cible). Comme un pixel ne dépasse " +
-      "jamais sa cible, seuls les pixels situés au-delà du centre de la famille sont concernés : effet faible " +
-      "sur une famille étroite (SII, Ha), visible sur une famille large (OIII) avec une palette.</p>",
+      "(0 = conservées, 1 = toute la famille prend exactement la teinte de la cible). Dès qu'il est au-dessus de 0, " +
+      "la famille est centrée sur la cible et garde le reste de ses écarts des deux côtés (palettes : 0,5, la " +
+      "moitié). À 0, un pixel ne dépasse jamais sa cible : effet visible surtout sur une famille large (OIII).</p>",
    target: "<p><b>Couleur cible</b> (teinte en degrés : 0 rouge, 30 orange, 50 or, 60 jaune, 120 vert, 180 cyan, " +
       "240 bleu, 300 magenta). La pastille montre la couleur. La laisser sur la couleur actuelle ne change rien " +
       "(sauf resserrement).</p>",
    force: "<p><b>Force</b> : 0 = raie inactive, 1 = les zones de cette raie vont jusqu'à la cible, entre les " +
-      "deux = en partie. Un pixel ne dépasse jamais sa cible.</p>",
+      "deux = en partie. Sans resserrement, un pixel ne dépasse jamais sa cible ; avec un resserrement (palettes), " +
+      "la famille se répartit des deux côtés de la cible.</p>",
    tol: "<p><b>Tolérance</b> (degrés) : un filtre sur la couleur actuelle. Le script sait par les masters quels pixels " +
       "appartiennent à une raie ; la tolérance dit en plus lesquels ont le droit de bouger selon leur couleur. Seuls les pixels dont " +
       "la couleur lissée est à moins de cette distance de la couleur actuelle de la raie sont concernés, avec " +
@@ -1455,21 +1494,22 @@ function buildTips()
       "final image. <b>Merged</b>: the ratio varies but the colour does not follow (two-colour look).</p>",
    preset: "<p><b>Preset</b>. <b>Proposal</b>: targets on the current colours, and a split of the merged or " +
       "partly separated pairs. The others fill the targets with a palette; <b>True colours</b>: hues computed " +
-      "from the emission wavelengths (SII and Ha give the same red, OIII a green-teal). <b>Custom</b>: your own " +
-      "targets (automatic as soon as you edit one).</p>",
+      "from the emission wavelengths (SII and Ha give the same red, OIII a green-teal); <b>Copper and teal</b>: " +
+      "copper filaments, amber cores, teal OIII, bold colours. <b>Custom</b>: your own targets (automatic as soon as you edit one).</p>",
    mixed: "<p><b>Mixed areas</b> of a pair of lines (usually SII/Ha): where both lines are at their usual " +
       "ratio. 0 = they keep their colour, only the areas where one line is stronger than usual move toward " +
       "its target (subtle split, as in the proposal); 1 = they take the colour halfway between the two " +
       "targets (the whole pair is recoloured, as with a palette).</p>",
    tight: "<p><b>Hue tightening</b>: reduces the hue variations inside a family (0 = kept, 1 = the whole " +
-      "family takes exactly the target hue). Since a pixel never goes past its target, only the pixels beyond " +
-      "the family centre are affected: weak effect on a narrow family (SII, Ha), visible on a wide family " +
-      "(OIII) with a palette.</p>",
+      "family takes exactly the target hue). Above 0, the family is centred on the target and keeps the rest of " +
+      "its spread on both sides (palettes: 0.5, half of it). At 0, a pixel never goes past its target: the " +
+      "effect shows mostly on a wide family (OIII).</p>",
    target: "<p><b>Target colour</b> (hue in degrees: 0 red, 30 orange, 50 gold, 60 yellow, 120 green, 180 cyan, " +
       "240 blue, 300 magenta). The swatch shows the colour. Leaving it on the current colour changes nothing " +
       "(except tightening).</p>",
    force: "<p><b>Strength</b>: 0 = line inactive, 1 = the areas of this line go all the way to the target, in " +
-      "between = part of the way. A pixel never goes past the target.</p>",
+      "between = part of the way. Without tightening, a pixel never goes past the target; with tightening " +
+      "(palettes), the family spreads on both sides of the target.</p>",
    tol: "<p><b>Tolerance</b> (degrees): a filter on the current colour. The masters tell the script which pixels " +
       "belong to a line; the tolerance also says which of them may move, according to their colour. Only pixels whose smoothed " +
       "colour is within this distance of the line's current colour are affected, with an effect that fades " +
