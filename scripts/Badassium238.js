@@ -7,59 +7,62 @@
    original image. Interface in English or French.
 
 /*
- * Badassium238.js  v1.2.2
+ * Badassium238.js  v1.2.3
  * Copyright (c) 2026 Jacques Pouyaud. MIT License (see LICENSE).
- * Code écrit par Claude (Anthropic),
- * sous la direction de Jacques Pouyaud.
+ * Code written by Claude (Anthropic),
+ * under the direction of Jacques Pouyaud.
  * https://github.com/jps-34/Badassium238
  *
- * v1.2.2 : préréglage « Cuivre et sarcelle ». Palettes : la famille garde ses écarts des
- *   deux côtés de la cible (sans butée), comme la passe 3 de la 1.1 (en 1.2.0 et
- *   1.2.1 l'OIII sortait bleu au lieu de turquoise-vert en Minéral). Les réglages
- *   mémorisés par 1.2 sont repris (Personnalisée retrouvée malgré le nouvel index).
- * v1.2.1 : tolérance jusqu'à 180° (= sans limite), mise par les palettes comme en 1.1.
- * v1.2.0 : réécriture. Un seul moteur de couleur (cible par raie, appartenance
- *   aux familles, resserrement des variations), proposition continue, couleurs
- *   indéterminées détectées, mesure du signal des masters, réglages mémorisés
- *   signalés, bouton Réinitialiser visible. PixInsight 1.9.4 et plus (V8).
+ * v1.2.3: the restored-settings notice lists settings by their displayed names,
+ *   in the current language (it showed internal names, frozen in the start-up
+ *   language). Code comments in English.
+ * v1.2.2: "Copper and teal" preset. Palettes: each family keeps its spread on
+ *   both sides of the target (no clamp), like pass 3 of 1.1 (in 1.2.0 and 1.2.1
+ *   OIII came out blue instead of teal-green with Mineral). Settings saved by
+ *   1.2 are kept (Custom found again despite the new index).
+ * v1.2.1: tolerance up to 180° (= no limit), set by the palettes as in 1.1.
+ * v1.2.0: rewrite. Single colour engine (target per line, family membership,
+ *   tightening of variations), continuous proposal, undefined colours detected,
+ *   master signal measured, restored settings flagged, visible Reset button.
+ *   PixInsight 1.9.4 and later (V8).
  * ----------------------------------------------------------------------------
- * 1. Analyse
- *   - Les trois couches linéaires sans étoiles sont lues (copies), réduites,
- *     lissées, leur fond retiré, SII et OIII mis au niveau de Ha.
- *   - Pour chaque paire de raies : part du signal partagée, variation du
- *     rapport entre les deux, et écart de teinte que ce rapport produit dans
- *     l'image finale. Une paire dont le rapport varie mais dont la teinte ne
- *     suit pas est "confondue" (bichromie).
- *   - Couleur actuelle de chaque raie (moyenne circulaire) et sa
- *     concentration : en dessous d'un seuil, la couleur est "indéterminée".
- *   - Cartes "caractère" (pour une paire confondue : où une raie est plus
- *     forte que d'habitude par rapport à sa partenaire) et proportions des
- *     raies, lissées. Rien sur le fond.
+ * 1. Analysis
+ *   - The three linear starless layers are read (copies), downsampled,
+ *     smoothed, background removed, SII and OIII levelled on Ha.
+ *   - For each pair of lines: share of common signal, variation of the ratio
+ *     between them, and the hue difference this ratio produces in the final
+ *     image. A pair whose ratio varies but whose hue does not follow is
+ *     "merged" (two-colour look).
+ *   - Current colour of each line (circular mean) and its concentration:
+ *     below a threshold, the colour is "undefined".
+ *   - "Character" maps (for a merged pair: where one line is stronger than
+ *     usual compared with its partner) and line proportions, smoothed.
+ *     Nothing on the background.
  *
- * 2. Couleurs (aperçu, Appliquer) : un seul moteur
- *   Chaque pixel appartient aux trois familles de couleur (une par raie) selon
- *   les proportions des raies (une paire confondue est partagée par le
- *   caractère). Chaque famille est tournée, dans le plan de chrominance
- *   YCbCr (Rec. 709), de sa couleur actuelle vers sa cible, dosée par la force,
- *   la tolérance (proximité de la couleur actuelle avec la famille) et le
- *   signal ; les variations internes d'une famille peuvent être resserrées.
- *   La luminance Y = 0,2126 R + 0,7152 V + 0,0722 B est conservée exactement.
- *   Garde-fou : si la nouvelle couleur sort des couleurs affichables, sa
- *   saturation est réduite juste assez ; aucun canal ne dépasse
- *   max(0,99 ; sa valeur d'origine).
+ * 2. Colours (preview, Apply): a single engine
+ *   Each pixel belongs to the three colour families (one per line) according
+ *   to the line proportions (a merged pair is shared by the character). Each
+ *   family is rotated, in the YCbCr (Rec. 709) chroma plane, from its current
+ *   colour toward its target, weighted by strength, tolerance (closeness of
+ *   the current colour to the family) and signal; the internal variations of
+ *   a family can be tightened.
+ *   Luminance Y = 0.2126 R + 0.7152 G + 0.0722 B is kept exactly.
+ *   Guard: if the new colour falls outside the displayable range, its
+ *   saturation is reduced just enough; no channel exceeds
+ *   max(0.99, its original value).
  *
- * Les trois couches linéaires ne servent qu'à repérer où chaque raie domine
- * (zones de recouvrement) ; c'est l'image finale étirée qui change de couleur.
+ * The three linear layers are only used to locate where each line dominates
+ * (overlap areas); it is the final stretched image whose colours change.
  */
 
 var TITLE = "Badassium238";
-var VERSION = "1.2.2";
+var VERSION = "1.2.3";
 var LANG_KEY = "Badassium238/language";
 var LANG = "en";
 var TIPS = {};
 
 // ============================================================================
-// Langue
+// Language
 // ============================================================================
 
 function detectLanguage()
@@ -107,17 +110,17 @@ function L( fr, en )
 }
 
 // ============================================================================
-// Paramètres
+// Settings
 // ============================================================================
 
-var SETTINGS_KEY = "Badassium238/settings12";   // nouvelle clé : les réglages 1.0/1.1 ne sont pas repris
+var SETTINGS_KEY = "Badassium238/settings12";   // new key: 1.0/1.1 settings are not carried over
 var LINES = [ "SII", "Ha", "OIII" ];
 var ORDERS = [ "SHO", "SOH", "HSO", "HOS", "OSH", "OHS" ];
 var LETTER = [ "S", "H", "O" ];
-var UNDEFINED_R = 0.35;      // concentration de teinte en dessous de laquelle une couleur est "indéterminée"
-var HA_GOLD_MAX = 48;        // la proposition ne pousse pas le Ha au-delà (jaune-vert à l'écran)
+var UNDEFINED_R = 0.35;      // hue concentration below which a colour is "undefined"
+var HA_GOLD_MAX = 48;        // the proposal never pushes Ha beyond this (yellow-green on screen)
 
-// Préréglages : [ nom fr, nom en, SII, Ha, OIII, saturation, resserrement, zones mixtes ]
+// Presets: [ fr name, en name, SII, Ha, OIII, saturation, tightening, mixed areas ]
 var PRESETS = [
    [ "Proposition (séparer les raies confondues)", "Proposal (split the merged lines)", NaN, NaN, NaN, 1, 0, 0 ],
    [ "SII rouge, Ha or, OIII bleu", "SII red, Ha gold, OIII blue", 5, 45, 225, 1, 0.5, 1 ],
@@ -155,7 +158,7 @@ var STR_KEYS  = [ "sId", "hId", "oId", "tId", "lastIds" ];
 var BOOL_KEYS = [ "autoBg", "autoWeights", "showAdvanced" ];
 var REAL_KEYS = [ "order", "blurLines", "blurMap", "blurColor", "split", "sigPct", "sharpPair", "sharpFam",
                   "bgS", "bgH", "bgO", "kS", "kO", "preset", "nPresets", "tight", "mixed" ].concat( T_KEYS, F_KEYS, W_KEYS, SAT_KEYS );
-// réglages dont la restauration d'une session précédente mérite un avertissement
+// settings whose restoration from a previous session deserves a notice
 var NOTICE_KEYS = [ "blurLines", "blurMap", "blurColor", "split", "sigPct", "sharpPair", "sharpFam", "tight", "mixed" ];
 
 var TP = {};
@@ -200,14 +203,14 @@ function loadSettings()
          for ( var key in DEFAULTS )
             if ( o[key] !== undefined && typeof o[key] === typeof DEFAULTS[key] )
                TP[key] = o[key];
-         fixPresetIndex( typeof o.nPresets === "number" ? o.nPresets : 7 );   // 1.2.x : 7 préréglages
+         fixPresetIndex( typeof o.nPresets === "number" ? o.nPresets : 7 );   // 1.2.x: 7 presets
       }
    }
    catch ( e ) {}
 }
 
-// Réglages écrits par une version qui avait un autre nombre de préréglages : Personnalisée
-// (toujours le dernier) garde son sens, un index devenu invalide retombe sur la proposition.
+// Settings written by a version with a different number of presets: Custom
+// (always the last one) keeps its meaning, an index that became invalid falls back to the proposal.
 function fixPresetIndex( nSaved )
 {
    if ( TP.preset == nSaved - 1 )
@@ -217,7 +220,7 @@ function fixPresetIndex( nSaved )
    TP.nPresets = PRESETS.length;
 }
 
-// Réglages restaurés qui ne sont pas ceux par défaut (hors images et cibles)
+// Restored settings that are not the defaults (images and targets excluded)
 function restoredNotice()
 {
    var diff = [];
@@ -227,14 +230,35 @@ function restoredNotice()
       if ( TP[k] !== DEFAULTS[k] )
          diff.push( k );
    }
-   if ( !TP.autoBg ) diff.push( L( "fonds manuels", "manual backgrounds" ) );
-   if ( !TP.autoWeights ) diff.push( L( "poids manuels", "manual weights" ) );
-   if ( TP.preset == PRESET_CUSTOM ) diff.push( L( "cibles personnalisées", "custom targets" ) );
+   if ( !TP.autoBg ) diff.push( "autoBg" );
+   if ( !TP.autoWeights ) diff.push( "autoWeights" );
+   if ( TP.preset == PRESET_CUSTOM ) diff.push( "custom" );
    return diff;
 }
 
+// Displayed name of a setting flagged in the notice, in the current language
+function noticeLabel( k )
+{
+   switch ( k )
+   {
+   case "blurLines":   return L( "lissage des raies", "line smoothing" );
+   case "blurMap":     return L( "lissage des cartes", "map smoothing" );
+   case "blurColor":   return L( "lissage couleur", "colour smoothing" );
+   case "split":       return L( "écart proposé", "proposed split" );
+   case "sigPct":      return L( "seuil de signal", "signal threshold" );
+   case "sharpPair":   return L( "contraste séparation", "split contrast" );
+   case "sharpFam":    return L( "netteté des familles", "family sharpness" );
+   case "tight":       return L( "resserrement", "tightening" );
+   case "mixed":       return L( "zones mixtes", "mixed areas" );
+   case "autoBg":      return L( "fonds manuels", "manual backgrounds" );
+   case "autoWeights": return L( "poids manuels", "manual weights" );
+   case "custom":      return L( "cibles personnalisées", "custom targets" );
+   }
+   return k;
+}
+
 // ============================================================================
-// Outils généraux
+// General tools
 // ============================================================================
 
 function log( s )
@@ -290,7 +314,7 @@ function closeView( v )
       v.window.forceClose();
 }
 
-// Copie 32 bits flottants normalisée [0,1] (PixelMath, fenêtre cachée).
+// 32-bit float copy normalised to [0,1] (PixelMath, hidden window).
 function floatCopy( srcView, newId )
 {
    var P = new PixelMath;
@@ -326,7 +350,7 @@ function floatCopy( srcView, newId )
    return v;
 }
 
-// Moyenne par blocs s x s d'un canal (et histogramme 16 bits optionnel).
+// s x s block average of a channel (and optional 16-bit histogram).
 function blockAverage( view, channel, s, hist )
 {
    var img = view.image;
@@ -372,7 +396,7 @@ function histogramPeak( hist )
    return best / 65535;
 }
 
-// Flou gaussien séparable, bords en miroir.
+// Separable Gaussian blur, mirrored edges.
 function gaussBlur( src, w, h, sigma )
 {
    if ( !( sigma > 0.3 ) )
@@ -459,7 +483,7 @@ function smooth01( x )
    return x * x * ( 3 - 2 * x );
 }
 
-// Teinte HSV en degrés, -1 si gris.
+// HSV hue in degrees, -1 if grey.
 function hueDeg( r, g, b )
 {
    var mx = Math.max( r, g, b ), mn = Math.min( r, g, b ), d = mx - mn;
@@ -487,7 +511,7 @@ function rgbOfHue( hdeg )
    return [ 1, 0, x ];
 }
 
-// Angle de la teinte HSV dans le plan (Cb, Cr) Rec. 709.
+// Angle of the HSV hue in the (Cb, Cr) Rec. 709 plane.
 function ycAngleOfHue( hdeg )
 {
    var c = rgbOfHue( hdeg );
@@ -502,8 +526,8 @@ function hexOfHue( hdeg )
    return "#" + hx( c[0] ) + hx( c[1] ) + hx( c[2] );
 }
 
-// Moyenne circulaire de la teinte (pondérée par la saturation) sur un masque :
-// { hue: degrés, R: concentration 0..1 (1 = toutes les teintes identiques), n }
+// Circular mean of the hue (weighted by saturation) over a mask:
+// { hue: degrees, R: concentration 0..1 (1 = all hues identical), n }
 function meanHue( fr, fg, fb, mask )
 {
    var sx = 0, sy = 0, sw = 0, n = 0;
@@ -529,10 +553,10 @@ function meanHue( fr, fg, fb, mask )
 }
 
 // ============================================================================
-// 1. Analyse
+// 1. Analysis
 // ============================================================================
 
-var ANA = null;   // résultat de la dernière analyse
+var ANA = null;   // result of the last analysis
 
 function analysisKey( p )
 {
@@ -563,7 +587,7 @@ function checkInputs( p )
    return { S: S, H: H, O: O, T: T };
 }
 
-// Format des échantillons d'une vue : "f32", "u16"... ou "" si inconnu.
+// Sample format of a view: "f32", "u16"... or "" if unknown.
 function sampleFormatOf( view )
 {
    try
@@ -585,7 +609,7 @@ function analyse( p )
    var ww = Math.ceil( W / s ), wh = Math.ceil( H / s ), n = ww * wh;
    log( "<b>" + TITLE + L( " : analyse</b> (", ": analysis</b> (" ) + W + "x" + H + L( ", travail en ", ", working size " ) + ww + "x" + wh + ")" );
 
-   // Lecture des couches (copies) : moyennes par blocs + histogrammes 16 bits
+   // Read the layers (copies): block averages + 16-bit histograms
    var raw = [], hists = [], fmt = [];
    var srcLines = [ v.S, v.H, v.O ];
    for ( var i = 0; i < 3; ++i )
@@ -628,7 +652,7 @@ function analyse( p )
    }
    var bg = [ p.bgS, p.bgH, p.bgO ];
 
-   // Couches lissées, fond retiré
+   // Smoothed layers, background removed
    var sig = p.blurLines / s;
    var Lb = [];
    for ( var i = 0; i < 3; ++i )
@@ -638,7 +662,7 @@ function analyse( p )
       for ( var i = 0; i < 3; ++i )
          ex[i][j] = Math.max( 0, Lb[i][j] - bg[i] );
 
-   // Qualité du signal de chaque master : médiane et 99e centile au-dessus du fond (en 1/65535)
+   // Signal quality of each master: median and 99th percentile above background (in 1/65535)
    var quality = [];
    for ( var i = 0; i < 3; ++i )
    {
@@ -648,7 +672,7 @@ function analyse( p )
       quality[i] = { p50: percentileOf( above, 50 ), p99: percentileOf( above, 99 ), fmt: fmt[i] };
    }
 
-   // Mise à niveau sur Ha (zones où Ha est le plus fort)
+   // Levelling on Ha (areas where Ha is strongest)
    if ( p.autoWeights )
    {
       var p70 = percentileOf( ex[1], 70 );
@@ -668,7 +692,7 @@ function analyse( p )
    }
    var kk = [ p.kS, 1, p.kO ];
 
-   // Proportions et poids du signal
+   // Proportions and signal weights
    var pr = [ new Float32Array( n ), new Float32Array( n ), new Float32Array( n ) ];
    var tot = new Float32Array( n ), on = new Uint8Array( n ), totOn = [];
    for ( var j = 0; j < n; ++j )
@@ -702,7 +726,7 @@ function analyse( p )
       }
    }
 
-   // Diagnostic des paires
+   // Pair diagnosis
    var pairs = [ [ 0, 1 ], [ 0, 2 ], [ 1, 2 ] ];
    var diag = [];
    var d = new Float32Array( n );
@@ -741,8 +765,8 @@ function analyse( p )
             if ( d[j] <= D.p10 ) bot[j] = 1;
          }
       var mA = meanHue( fr, fg, fb, top ), mB = meanHue( fr, fg, fb, bot ), m0 = meanHue( fr, fg, fb, zone );
-      D.hueA = mA.hue;     // là où A est relativement plus fort
-      D.hueB = mB.hue;     // là où B est relativement plus fort
+      D.hueA = mA.hue;     // where A is relatively stronger
+      D.hueB = mB.hue;     // where B is relatively stronger
       D.h0 = m0.hue;
       D.R0 = m0.R;
       D.sep = wrapDeg( D.hueB - D.hueA );
@@ -754,11 +778,11 @@ function analyse( p )
       D.scale = Math.max( 1e-4, percentileOf( dev, 95 ) );
       D.confused = D.spread >= 0.1 && Math.abs( D.sep ) < 10 && D.R0 >= UNDEFINED_R;
       D.verdict = D.confused ? "merged" : ( Math.abs( D.sep ) >= 25 ? "sep" : "partial" );
-      D.pairable = D.confused || D.verdict == "partial";   // partagée par le caractère dans le moteur
+      D.pairable = D.confused || D.verdict == "partial";   // shared by the character in the engine
       diag.push( D );
    }
 
-   // Couleur actuelle de chaque raie et sa concentration
+   // Current colour of each line and its concentration
    var fam = [ NaN, NaN, NaN ], famR = [ 0, 0, 0 ], inPair = [ -1, -1, -1 ];
    for ( var q = 0; q < 3; ++q )
       if ( diag[q].confused )
@@ -788,7 +812,7 @@ function analyse( p )
       }
    var famOk = [ famR[0] >= UNDEFINED_R, famR[1] >= UNDEFINED_R, famR[2] >= UNDEFINED_R ];
 
-   // Dispersion de teinte de chaque famille (90e centile de l'écart à sa couleur)
+   // Hue spread of each family (90th percentile of the distance to its colour)
    var famSpread = [ 30, 30, 30 ];
    for ( var i = 0; i < 3; ++i )
    {
@@ -815,8 +839,8 @@ function analyse( p )
          famSpread[i] = percentileOf( devs, 90 );
    }
 
-   // Cartes "caractère" : pour une paire confondue ou en partie séparée, où une raie est plus forte
-   // que d'habitude par rapport à sa partenaire (de -1 à 1, dans ch[a] et ch[b]) ; pondérées par le signal.
+   // "Character" maps: for a merged or partly separated pair, where one line is stronger
+   // than usual compared with its partner (-1 to 1, in ch[a] and ch[b]); weighted by the signal.
    var ch = [ new Float32Array( n ), new Float32Array( n ), new Float32Array( n ) ];
    for ( var q = 0; q < 3; ++q )
    {
@@ -840,7 +864,7 @@ function analyse( p )
          ch[i][j] *= wsig[j];
       ch[i] = gaussBlur( ch[i], ww, wh, p.blurMap / s );
    }
-   // Proportions lissées (appartenance aux familles)
+   // Smoothed proportions (family membership)
    var prs = [];
    for ( var i = 0; i < 3; ++i )
    {
@@ -854,7 +878,7 @@ function analyse( p )
       for ( var j = 0; j < n; ++j )
          prs[i][j] = sigMap[j] > 1e-6 ? prs[i][j] / sigMap[j] : 0;
 
-   // Couleur lissée de l'image finale (pour la tolérance)
+   // Smoothed colour of the final image (for the tolerance)
    var ys = new Float32Array( n ), cb = new Float32Array( n ), cr = new Float32Array( n );
    for ( var j = 0; j < n; ++j )
    {
@@ -919,7 +943,7 @@ function verdictText( D )
    }
 }
 
-// Phrase de résumé après l'analyse
+// Summary sentence after the analysis
 function summaryText( ana )
 {
    var parts = [];
@@ -955,7 +979,7 @@ function summaryText( ana )
 }
 
 // ============================================================================
-// Proposition et préréglages
+// Proposal and presets
 // ============================================================================
 
 function proposedTolerance( ana, i )
@@ -971,8 +995,8 @@ function proposedTolerance( ana, i )
    return tol;
 }
 
-// Proposition : cibles sur les couleurs actuelles, puis séparation des paires confondues
-// ou en partie séparées jusqu'à 2 x split. Pour SII/Ha (ordre SHO), le Ha ne dépasse pas l'or.
+// Proposal: targets on the current colours, then split of the merged or partly
+// separated pairs up to 2 x split. For SII/Ha (SHO order), Ha does not go beyond gold.
 function propose( p, ana )
 {
    for ( var i = 0; i < 3; ++i )
@@ -993,10 +1017,10 @@ function propose( p, ana )
       if ( !ana.famOk[D.a] || !ana.famOk[D.b] )
          continue;
       var ra = order.indexOf( LETTER[D.a] ), rb = order.indexOf( LETTER[D.b] );
-      var lo = ra < rb ? D.a : D.b, hi = ra < rb ? D.b : D.a;   // lo : canal le plus rouge -> vers le rouge
+      var lo = ra < rb ? D.a : D.b, hi = ra < rb ? D.b : D.a;   // lo: reddest channel -> toward red
       var center = D.confused ? D.h0 : wrap360( ana.fam[lo] + 0.5 * wrapDeg( ana.fam[hi] - ana.fam[lo] ) );
       var tLo = wrap360( center - p.split ), tHi = wrap360( center + p.split );
-      // Ha : pas au-delà de l'or (jaune-vert à l'écran) ; l'écart est reporté sur l'autre raie
+      // Ha: not beyond gold (yellow-green on screen); the difference goes to the other line
       if ( hi == 1 && wrapDeg( tHi - HA_GOLD_MAX ) > 0 && wrapDeg( tHi - HA_GOLD_MAX ) < 90 )
       {
          tHi = HA_GOLD_MAX;
@@ -1016,7 +1040,7 @@ function presetName( idx )
    return L( e[0], e[1] );
 }
 
-// Applique un préréglage (sans effet pour Personnalisée ; Proposition exige une analyse).
+// Applies a preset (no effect for Custom; Proposal requires an analysis).
 function applyPreset( p, idx, ana )
 {
    p.preset = idx;
@@ -1034,19 +1058,19 @@ function applyPreset( p, idx, ana )
       p[T_KEYS[i]] = e[2 + i];
       p[F_KEYS[i]] = ( ana != null && !ana.famOk[i] ) ? 0 : 1;
       p[SAT_KEYS[i]] = e[5];
-      p[W_KEYS[i]] = 180;     // palette : toute la famille tourne (comme la passe 3 de la 1.1)
+      p[W_KEYS[i]] = 180;     // palette: the whole family rotates (like pass 3 of 1.1)
    }
    p.tight = e[6];
    p.mixed = e[7];
 }
 
 // ============================================================================
-// 2. Moteur de couleur
+// 2. Colour engine
 // ============================================================================
 
-// Appartenance d'un pixel aux familles (somme <= 1) : dominance des proportions
-// (exposant sharpFam) ; une paire confondue compte comme un groupe, partagé entre ses
-// deux raies selon le caractère (exposant sharpPair : contraste de la séparation).
+// Membership of a pixel in the families (sum <= 1): dominance of the proportions
+// (exponent sharpFam); a merged pair counts as one group, shared between its
+// two lines according to the character (exponent sharpPair: split contrast).
 function familyWeights( p0, p1, p2, c0, c1, c2, sg, P, w )
 {
    var pr = [ p0, p1, p2 ], ch = [ c0, c1, c2 ];
@@ -1059,7 +1083,7 @@ function familyWeights( p0, p1, p2, c0, c1, c2, sg, P, w )
       if ( t <= 1e-12 )
          return;
       var u = clamp( ( ch[a] - ch[b] ) / Math.max( sg, 0.05 ), -1, 1 );
-      // zones mixtes (rapport habituel, u = 0) : inchangées (mixed = 0) ou partagées à parts égales (mixed = 1)
+      // mixed areas (usual ratio, u = 0): unchanged (mixed = 0) or shared equally (mixed = 1)
       var sa = clamp( 0.5 + 0.5 * P.sharpPair * u, 0, 1 );
       var ea = clamp( P.sharpPair * u, 0, 1 ), eb = clamp( -P.sharpPair * u, 0, 1 );
       w[a] = gp / t * ( P.mixed * sa + ( 1 - P.mixed ) * ea );
@@ -1077,7 +1101,7 @@ function familyWeights( p0, p1, p2, c0, c1, c2, sg, P, w )
    }
 }
 
-// Paramètres du moteur pour un jeu de réglages : cibles, centres mesurés des familles.
+// Engine parameters for a set of settings: targets, measured family centres.
 function mixParams( p, ana )
 {
    var P = [];
@@ -1109,8 +1133,8 @@ function mixParams( p, ana )
       P[i].on = P[i].force > 0 || P[i].sat != 1;
    P.any = P[0].on || P[1].on || P[2].on;
 
-   // Centre de chaque famille dans le plan (Cb, Cr) : moyenne circulaire sur un échantillon,
-   // pondérée par appartenance x signal x chrominance (sert au resserrement)
+   // Centre of each family in the (Cb, Cr) plane: circular mean over a sample,
+   // weighted by membership x signal x chroma (used for tightening)
    var n = ana.ww * ana.wh, step = Math.max( 1, Math.floor( n / 60000 ) );
    var sx = [ 0, 0, 0 ], sy = [ 0, 0, 0 ], sw = [ 0, 0, 0 ], w = [ 0, 0, 0 ];
    for ( var j = 0; j < n; j += step )
@@ -1138,8 +1162,8 @@ function mixParams( p, ana )
    return P;
 }
 
-// Calcule la nouvelle couleur d'un pixel. out = [r, g, b]. Retourne true si modifié.
-// ch0..2 : caractère ; ys/cbs/crs : couleur lissée (tolérance) ; sg : signal ; p0..2 : proportions.
+// Computes the new colour of a pixel. out = [r, g, b]. Returns true if changed.
+// ch0..2: character; ys/cbs/crs: smoothed colour (tolerance); sg: signal; p0..2: proportions.
 function mixPixel( r, g, b, c0, c1, c2, ys, cbs, crs, P, out, st, sg, p0, p1, p2 )
 {
    out[0] = r; out[1] = g; out[2] = b;
@@ -1150,7 +1174,7 @@ function mixPixel( r, g, b, c0, c1, c2, ys, cbs, crs, P, out, st, sg, p0, p1, p2
    var m = Math.sqrt( Cb * Cb + Cr * Cr );
    if ( m < 1e-7 )
       return false;
-   // teinte de la couleur lissée (pour la tolérance)
+   // hue of the smoothed colour (for the tolerance)
    var rs = ys + 1.5748 * crs, bs = ys + 1.8556 * cbs, gs = ( ys - 0.2126 * rs - 0.0722 * bs ) / 0.7152;
    var hs = hueDeg( rs, gs, bs );
    if ( hs < 0 )
@@ -1169,16 +1193,16 @@ function mixPixel( r, g, b, c0, c1, c2, ys, cbs, crs, P, out, st, sg, p0, p1, p2
       var a = w[i] * close * ks;
       if ( Li.force > 0 )
       {
-         // rotation de la famille : (cible - centre), moins le resserrement de l'écart du pixel au centre
+         // family rotation: (target - centre), minus the tightening of the pixel's distance to the centre
          var dC = wrapRad( phi - Li.c );
          var dRot = wrapRad( Li.phiT - Li.c ) - P.tight * dC;
          if ( P.tight > 0 )
          {
-            // palette (resserrement > 0) : comme la passe 3 de la 1.1, la famille est centrée sur la
-            // cible et garde (1 - resserrement) de ses écarts DES DEUX CÔTÉS, sans butée à la cible
-            // (avec butée, le côté situé entre le centre et la cible s'écrase sur la cible et la
-            // famille glisse d'un côté : OIII plus bleu qu'en 1.1). Effet effacé au-delà de 120°
-            // du centre, comme en 1.1 (à 180° le sens de rotation serait indéterminé).
+            // palette (tightening > 0): like pass 3 of 1.1, the family is centred on the
+            // target and keeps (1 - tightening) of its spread ON BOTH SIDES, with no clamp at the target
+            // (with a clamp, the side between the centre and the target collapses onto the target and the
+            // family slides to one side: OIII bluer than in 1.1). Effect faded out beyond 120°
+            // from the centre, as in 1.1 (at 180° the rotation direction would be undefined).
             var ad = Math.abs( dC );
             if ( ad > 2 * Math.PI / 3 )
             {
@@ -1188,8 +1212,8 @@ function mixPixel( r, g, b, c0, c1, c2, ys, cbs, crs, P, out, st, sg, p0, p1, p2
          }
          else
          {
-            // proposition (sans resserrement) : un pixel ne dépasse jamais la cible
-            // (et ne bouge pas s'il est déjà au-delà)
+            // proposal (no tightening): a pixel never goes past its target
+            // (and does not move if it is already beyond it)
             var toT = wrapRad( Li.phiT - phi );
             if ( dRot * toT <= 0 )
                dRot = 0;
@@ -1212,8 +1236,8 @@ function mixPixel( r, g, b, c0, c1, c2, ys, cbs, crs, P, out, st, sg, p0, p1, p2
    var m2 = m * satf, ph = phi + theta;
    var Cb2 = m2 * Math.cos( ph ), Cr2 = m2 * Math.sin( ph );
    var dR = 1.5748 * Cr2, dB = 1.8556 * Cb2, dG = -( 0.2126 * dR + 0.0722 * dB ) / 0.7152;
-   // Garde-fou : saturation réduite juste assez pour rester affichable
-   // plafond par canal : 0,99, ou sa valeur d'origine si elle était déjà plus haute
+   // Guard: saturation reduced just enough to stay displayable
+   // per-channel ceiling: 0.99, or its original value if it was already higher
    var f = 1;
    var dd = [ dR, dG, dB ], cap = [ Math.max( 0.99, r ), Math.max( 0.99, g ), Math.max( 0.99, b ) ];
    for ( var k = 0; k < 3; ++k )
@@ -1232,7 +1256,7 @@ function mixPixel( r, g, b, c0, c1, c2, ys, cbs, crs, P, out, st, sg, p0, p1, p2
    return true;
 }
 
-// Mélange sur l'image de travail (aperçu). Retourne une Image RVB 32 bits.
+// Mix on the working image (preview). Returns a 32-bit RGB Image.
 function previewImage( p, ana, before, st )
 {
    var ww = ana.ww, wh = ana.wh;
@@ -1258,7 +1282,7 @@ function previewImage( p, ana, before, st )
    return img;
 }
 
-// Image des familles : rouge = SII, vert = Ha, bleu = OIII (appartenance x signal).
+// Family image: red = SII, green = Ha, blue = OIII (membership x signal).
 function showLineMap( p, ana )
 {
    var ww = ana.ww, wh = ana.wh, n = ww * wh;
@@ -1300,7 +1324,7 @@ function bilin( map, ww, wh, x0, x1, tx, y0, y1, ty )
    return ( a * ( 1 - tx ) + b * tx ) * ( 1 - ty ) + ( c * ( 1 - tx ) + d * tx ) * ty;
 }
 
-// Application en pleine résolution : crée <id>_mix.
+// Full-resolution apply: creates <id>_mix.
 function applyFull( p )
 {
    var t0 = Date.now();
@@ -1382,7 +1406,7 @@ function applyFull( p )
 }
 
 // ============================================================================
-// Infobulles
+// Tooltips
 // ============================================================================
 
 function buildTips()
@@ -1556,7 +1580,7 @@ function buildTips()
 }
 
 // ============================================================================
-// Aperçu (zone défilante avec zoom)
+// Preview (scrolling area with zoom)
 // ============================================================================
 
 var PreviewBox = class extends ScrollBox {
@@ -1666,15 +1690,16 @@ setBitmap( bmp )
 };
 
 // ============================================================================
-// Dialogue
+// Dialog
 // ============================================================================
 
-var STARTUP_NOTICE = "";   // réglages restaurés non standard (liste), vidée par Réinitialiser
+var STARTUP_NOTICE = [];   // keys of the restored non-default settings, cleared by Reset
 
 function noticeText()
 {
-   return L( "<b>Réglages de la dernière session restaurés</b> (" + STARTUP_NOTICE + "). Le bouton Réinitialiser remet les valeurs par défaut.",
-             "<b>Settings restored from the last session</b> (" + STARTUP_NOTICE + "). The Reset button restores the defaults." );
+   var names = STARTUP_NOTICE.map( noticeLabel ).join( ", " );
+   return L( "<b>Réglages de la dernière session restaurés</b> (" + names + "). Le bouton Réinitialiser remet les valeurs par défaut.",
+             "<b>Settings restored from the last session</b> (" + names + "). The Reset button restores the defaults." );
 }
 
 var MixDialog = class extends Dialog {
@@ -1687,7 +1712,7 @@ constructor()
    var labelWidth = this.font.width( L( "Lissage des raies (px) :", "Line smoothing (px):" ) ) + 10;
    var autoWidth = this.font.width( "Auto" ) + 32;
 
-   // --- utilitaires de construction -------------------------------------
+   // --- construction helpers -------------------------------------
    this.numeric = {};
    this.numRange = {};
    this.fine = {};
@@ -1731,7 +1756,7 @@ constructor()
       return nc;
    };
 
-   // Curseur fin : zoom de ± span autour de la valeur du curseur principal.
+   // Fine slider: zoom of ± span around the value of the main slider.
    this.makeFine = function( key, span, prec, onChange, lw )
    {
       var steps = 400;
@@ -1789,7 +1814,7 @@ constructor()
    };
 
    var stale = function() { self.markStale(); };
-   // modification d'une cible / force / tolérance / saturation : préréglage Personnalisée
+   // change of a target / strength / tolerance / saturation: Custom preset
    var edit = function( key )
    {
       if ( TP.preset != PRESET_CUSTOM )
@@ -1851,7 +1876,7 @@ constructor()
    this.viewsGroup.sizer.add( this.rowO.sizer );
    this.viewsGroup.sizer.add( this.rowT.sizer );
 
-   // --- 2. Analyse ------------------------------------------------------------
+   // --- 2. Analysis ----------------------------------------------------------
    this.analyseButton = new PushButton( this );
    this.analyseButton.text = L( "Analyser", "Analyse" );
    this.analyseButton.toolTip = TIPS.analyse;
@@ -1900,7 +1925,7 @@ constructor()
    this.analyseGroup.sizer.add( this.diagLabel );
    this.analyseGroup.sizer.add( this.summaryLabel );
 
-   // --- 3. Couleurs (préréglage, resserrement) -------------------------------------
+   // --- 3. Colours (preset, tightening) -------------------------------------
    this.presetLabel = new Label( this );
    this.presetLabel.text = L( "Préréglage :", "Preset:" );
    this.presetLabel.minWidth = labelWidth;
@@ -1962,7 +1987,7 @@ constructor()
    this.colourHint.text = "";
    this.colourGroup.sizer.add( this.colourHint );
 
-   // --- Avancé ----------------------------------------------------------------
+   // --- Advanced -------------------------------------------------------------
    this.advCheck = this.makeCheck( L( "Réglages avancés", "Advanced settings" ), "showAdvanced", TIPS.advanced, function()
    {
       if ( TP.showAdvanced ) self.advGroup.show(); else self.advGroup.hide();
@@ -2005,7 +2030,7 @@ constructor()
    this.advGroup.sizer.add( this.row( this.makeNumeric( L( "Poids SII :", "SII weight:" ), "kS", 0.01, 100, 3, TIPS.weights, stale ), "autoWeights" ) );
    this.advGroup.sizer.add( this.row( this.makeNumeric( L( "Poids OIII :", "OIII weight:" ), "kO", 0.01, 100, 3, TIPS.weights, stale ) ) );
 
-   // --- Colonne de gauche --------------------------------------------------------
+   // --- Left column ----------------------------------------------------------
    this.helpLabel = new Label( this );
    this.helpLabel.useRichText = true;
    this.helpLabel.wordWrapping = true;
@@ -2052,7 +2077,7 @@ constructor()
    this.leftColumn = new Control( this );
    this.leftColumn.sizer = new VerticalSizer;
    this.leftColumn.sizer.spacing = 6;
-   // Avertissement "réglages restaurés" : rouge-orangé, clignote quelques secondes à l'ouverture
+   // "Restored settings" notice: red-orange, blinks for a few seconds on opening
    this.noticeLabel = new Label( this );
    this.noticeLabel.useRichText = true;
    this.noticeLabel.wordWrapping = true;
@@ -2067,7 +2092,7 @@ constructor()
    {
       ++self.blinkCount;
       self.noticeLabel.styleSheet = self.noticeStyles[self.blinkCount % 2];
-      if ( self.blinkCount >= 16 )      // 8 s, puis reste allumé
+      if ( self.blinkCount >= 16 )      // 8 s, then stays on
       {
          self.blinkTimer.stop();
          self.noticeLabel.styleSheet = self.noticeStyles[0];
@@ -2093,7 +2118,7 @@ constructor()
    this.leftColumn.sizer.addStretch();
    this.leftColumn.setMinWidth( this.logicalPixelsToPhysical( 430 ) );
 
-   // --- Raies (sous l'aperçu) ------------------------------------------------------------
+   // --- Lines (under the preview) -------------------------------------------
    this.swatch = [];
    this.famLabel = [];
    this.lineGroups = [];
@@ -2133,7 +2158,7 @@ constructor()
    for ( var i = 0; i < 3; ++i )
       linesRow.add( this.lineGroups[i], 100 );
 
-   // --- Aperçu ---------------------------------------------------------------------------
+   // --- Preview ---------------------------------------------------------------
    this.previewBox = new PreviewBox( this );
    this.previewBox.setMinSize( this.logicalPixelsToPhysical( 640 ), this.logicalPixelsToPhysical( 420 ) );
 
@@ -2181,7 +2206,7 @@ constructor()
    mainRow.add( this.leftColumn );
    mainRow.add( this.rightColumn, 100 );
 
-   // --- Boutons --------------------------------------------------------------------------
+   // --- Buttons ---------------------------------------------------------------
    this.newInstanceButton = new ToolButton( this );
    this.newInstanceButton.icon = this.scaledResource( ":/process-interface/new-instance.png" );
    this.newInstanceButton.setScaledFixedSize( 20, 20 );
@@ -2206,7 +2231,7 @@ constructor()
          TP[key] = ids[key];
       if ( ANA != null )
          propose( TP, ANA );
-      STARTUP_NOTICE = "";
+      STARTUP_NOTICE = [];
       self.stopBlink();
       self.noticeLabel.hide();
       self.refreshFromTP();
@@ -2262,7 +2287,7 @@ constructor()
    this.sizer.add( mainRow, 100 );
    this.sizer.add( bRow );
 
-   // --- Comportement ---------------------------------------------------------------------
+   // --- Behaviour -------------------------------------------------------------
    this.timer = new Timer;
    this.timer.periodic = false;
    this.timer.interval = 0.25;
@@ -2378,7 +2403,7 @@ constructor()
          ANA = null;
          analyse( TP );
          TP.lastIds = ANA.ids;
-         // cibles personnalisées : gardées sur les mêmes images, sinon retour à la proposition
+         // custom targets: kept on the same images, otherwise back to the proposal
          if ( TP.preset == PRESET_CUSTOM && prevIds != ANA.ids )
             TP.preset = PRESET_PROPOSAL;
          if ( !( TP.preset == PRESET_CUSTOM ) )
@@ -2465,7 +2490,7 @@ constructor()
 };
 
 // ============================================================================
-// Point d'entrée
+// Entry point
 // ============================================================================
 
 function main()
@@ -2498,7 +2523,7 @@ function main()
       var diff = restoredNotice();
       if ( diff.length > 0 )
       {
-         STARTUP_NOTICE = diff.join( ", " );
+         STARTUP_NOTICE = diff;
          log( TITLE + " : " + noticeText().replace( /<[^>]+>/g, "" ) );
       }
    }

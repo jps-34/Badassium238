@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.3 (2026-10-12)
+* The "Settings restored from the last session" notice now lists the settings by the names shown in
+  the dialog, in the current language. It showed internal names (`blurLines`, `split`...) and kept
+  the start-up language after a language switch.
+* Code comments and maintenance notes (`MAINTENANCE.md`) in English; the interface and the
+  tooltips stay in English and French. No change to the colour results.
+
 ## 1.2.2 (2026-10-11)
 * New preset **Copper and teal** (SII 12°, Ha 32°, OIII 185°, saturation 0.85): copper filaments,
   amber cores, teal OIII, bolder than *Mineral*.
