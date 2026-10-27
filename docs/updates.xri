@@ -5,10 +5,10 @@
       <p>Add https://jps-34.github.io/Badassium238/ under Resources &gt; Updates &gt; Manage Repositories.</p>
    </description>
    <platform os="all" arch="noarch" version="1.9.4:1.9.99">
-      <package fileName="Badassium238-1.2.4-PI194.zip" sha1="88fd8ea159c2a4fcfafbc35aa4a171c664fea048" type="script" releaseDate="20261027" serverURL="https://jps-34.github.io/Badassium238/">
-         <title>Badassium238 1.2.4 (PixInsight 1.9.4 and later)</title>
+      <package fileName="Badassium238-1.2.5-PI194.zip" sha1="719c29120052fa77c668707c910acfc881136453" type="script" releaseDate="20261027" serverURL="https://jps-34.github.io/Badassium238/">
+         <title>Badassium238 1.2.5 (PixInsight 1.9.4 and later)</title>
          <description>
-            <p>Breaks the two-colour look of SHO images: finds which emission lines end up with the same hue, then gives each line its own colour (for example SII red, Ha gold, OIII blue) by a hue-only rotation at constant luminance, with live preview and optional palette presets. English or French interface. The original image is never modified. Installs under Script &gt; Utilities &gt; Badassium238.</p>
+            <p>Breaks the two-colour look of SHO images: finds which emission lines end up with the same hue, then gives each line its own colour (for example SII red, Ha gold, OIII blue) by a hue-only rotation at constant luminance, with live preview and optional palette presets. English or French interface. The original image is never modified. Installs under Script &gt; JPS &gt; Badassium238.</p>
             <p>Copyright (c) 2026 Jacques Pouyaud. GNU GPL v3 or later. Source: https://github.com/jps-34/Badassium238</p>
          </description>
       </package>

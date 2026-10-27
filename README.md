@@ -80,7 +80,7 @@ and the choice is remembered.
 1. *Resources > Updates > Manage Repositories*, add
    `https://jps-34.github.io/Badassium238/`
 2. *Resources > Updates > Check for Updates*, then restart PixInsight.
-3. The script appears under *Script > Utilities > Badassium238*.
+3. The script appears under *Script > JPS > Badassium238* (*Script > Utilities* up to 1.2.4).
 
 Until the repository is code-signed, PixInsight only accepts it with the
 *Allow unsigned update repositories* security preference enabled.
@@ -89,7 +89,7 @@ Until the repository is code-signed, PixInsight only accepts it with the
 
 Download the `.js` file matching your PixInsight version, then either run it with
 *Script > Execute Script File*, or add its folder with *Script > Feature Scripts > Add* so it shows
-up in the *Script > Utilities* menu.
+up in the *Script > JPS* menu.
 
 ## Quick start
 

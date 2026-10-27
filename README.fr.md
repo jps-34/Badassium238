@@ -84,7 +84,7 @@ l'analyse et tous les réglages, et le choix est mémorisé.
 1. *Resources > Updates > Manage Repositories*, ajouter
    `https://jps-34.github.io/Badassium238/`
 2. *Resources > Updates > Check for Updates*, puis redémarrer PixInsight.
-3. Le script apparaît dans *Script > Utilities > Badassium238*.
+3. Le script apparaît dans *Script > JPS > Badassium238* (*Script > Utilities* jusqu'à la 1.2.4).
 
 Tant que le dépôt n'est pas signé, PixInsight ne l'accepte que si l'option de sécurité
 *Allow unsigned update repositories* est activée.
@@ -93,7 +93,7 @@ Tant que le dépôt n'est pas signé, PixInsight ne l'accepte que si l'option de
 
 Télécharger le `.js` qui correspond à ta version de PixInsight, puis soit le lancer avec
 *Script > Execute Script File*, soit ajouter son dossier avec *Script > Feature Scripts > Add* pour
-qu'il apparaisse dans le menu *Script > Utilities*.
+qu'il apparaisse dans le menu *Script > JPS*.
 
 ## Démarrage rapide
 

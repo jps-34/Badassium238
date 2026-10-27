@@ -1,13 +1,13 @@
 #engine v8
 
-#feature-id    Badassium238 : Utilities > Badassium238
+#feature-id    Badassium238 : JPS > Badassium238
 #feature-info  Finds which emission lines (SII, Ha, OIII) end up with the same hue in the \
    final image, then gives each line its own colour by a hue rotation at constant \
    luminance, with preview and palette presets. Creates a copy, never modifies the \
    original image. Interface in English or French.
 
 /*
- * Badassium238.js  v1.2.4
+ * Badassium238.js  v1.2.5
  * Copyright (c) 2026 Jacques Pouyaud.
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Free software under the GNU General Public License, version 3 or (at your
@@ -16,6 +16,7 @@
  * under the direction of Jacques Pouyaud.
  * https://github.com/jps-34/Badassium238
  *
+ * v1.2.5: menu entry moved to Script > JPS (was Script > Utilities).
  * v1.2.4: licence changed to GPL-3.0-or-later (1.2.3 and earlier: MIT).
  * v1.2.3: the restored-settings notice lists settings by their displayed names,
  *   in the current language (it showed internal names, frozen in the start-up
@@ -60,7 +61,7 @@
  */
 
 var TITLE = "Badassium238";
-var VERSION = "1.2.4";
+var VERSION = "1.2.5";
 var LANG_KEY = "Badassium238/language";
 var LANG = "en";
 var TIPS = {};

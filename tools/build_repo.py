@@ -37,7 +37,7 @@ PACKAGES = [
                 "same hue, then gives each line its own colour (for example SII red, Ha gold, OIII blue) "
                 "by a hue-only rotation at constant luminance, with live preview and optional palette "
                 "presets. English or French interface. The original image is never modified. "
-                "Installs under Script > Utilities > Badassium238.",
+                "Installs under Script > JPS > Badassium238.",
     },
     {
         "script": "scripts/legacy/Badassium238_PI193.js",
