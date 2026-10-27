@@ -48,7 +48,7 @@ PACKAGES = [
                 "Installs under Script > Utilities > Badassium238 PI193.",
     },
 ]
-NOTICE = "Copyright (c) 2026 Jacques Pouyaud. MIT License. Source: https://github.com/{user}/Badassium238"
+NOTICE = "Copyright (c) 2026 Jacques Pouyaud. GNU GPL v3 or later. Source: https://github.com/{user}/Badassium238"
 
 
 def script_version(path):

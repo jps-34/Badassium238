@@ -55,12 +55,12 @@ environ 24°, avec un écart de luminance mesuré nul et aucun nouveau pixel éc
 
 | Fichier | PixInsight |
 |---|---|
-| `scripts/Badassium238.js` (1.2.3) | 1.9.4 et suivants (moteur JavaScript V8) |
-| `scripts/legacy/Badassium238_PI193.js` (1.1.0, figée) | 1.8.9-3 à 1.9.3 (moteur historique) |
+| `scripts/Badassium238.js` (1.2.4) | 1.9.4 et suivants (moteur JavaScript V8) |
+| `scripts/legacy/Badassium238_PI193.js` (1.1.1, figée) | 1.8.9-3 à 1.9.3 (moteur historique) |
 
 PixInsight retire son moteur JavaScript historique (il est déjà absent sur macOS Apple Silicon) :
 à partir de la version 1.2, Badassium238 est développé pour le moteur V8 seulement. La version
-1.1.0 reste disponible pour PixInsight 1.9.3 et antérieurs, par le même dépôt de mises à jour.
+1.1 (1.1.1) reste disponible pour PixInsight 1.9.3 et antérieurs, par le même dépôt de mises à jour.
 
 Les images, toutes alignées pixel à pixel (pas de recadrage ni de rotation entre elles) :
 
@@ -198,9 +198,17 @@ et 3,5 au maximum.
 
 ## Licence
 
-Copyright (c) 2026 Jacques Pouyaud. Publié sous [licence MIT](LICENSE).
+Copyright (c) 2026 Jacques Pouyaud. Publié sous
+[licence publique générale GNU, version 3 ou ultérieure](LICENSE) (GPL-3.0-or-later) : tu peux
+l'utiliser, l'étudier, le partager et le modifier ; toute œuvre distribuée qui intègre ce code doit
+être publiée sous la même licence, avec son code source. Les versions jusqu'à 1.2.3 (et 1.1.0 pour
+PixInsight 1.9.3) ont été publiées sous licence MIT, qui reste valable pour les copies de ces versions.
 
-Si tu t'en sers pour autre chose, une mention et un lien vers ce dépôt font toujours plaisir.
+**Demande de crédit.** Si tu reprends la méthode, les préréglages ou le code de Badassium238, dans
+un script, une application ou un tutoriel, merci de le citer par son nom avec un lien vers ce dépôt.
+C'est une demande, pas une condition de la licence ; quand le code lui-même est repris, la GPL
+impose déjà de conserver la mention de copyright ci-dessus.
+
 Les rapports de bug et suggestions sont bienvenus dans les issues GitHub.
 
 ## Remerciements

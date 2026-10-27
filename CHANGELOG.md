@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.4 (2026-10-27)
+* Licence changed from MIT to the GNU General Public License, version 3 or later
+  (GPL-3.0-or-later). Versions up to 1.2.3 remain available under the MIT License. No change to
+  the script's behaviour or to the colour results.
+* The legacy script for PixInsight 1.9.3 and earlier becomes 1.1.1, with the same licence change
+  only.
+* README: explicit credit request for reuse of the method, the presets or the code.
+
 ## 1.2.3 (2026-10-12)
 * The "Settings restored from the last session" notice now lists the settings by the names shown in
   the dialog, in the current language. It showed internal names (`blurLines`, `split`...) and kept

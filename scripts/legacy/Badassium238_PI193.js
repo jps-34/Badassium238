@@ -15,11 +15,15 @@
 #include <pjsr/DataType.jsh>
 
 /*
- * Badassium238_PI193.js  v1.1.0 (version moteur historique, PixInsight 1.9.3)
- * Copyright (c) 2026 Jacques Pouyaud. MIT License (see LICENSE).
+ * Badassium238_PI193.js  v1.1.1 (version moteur historique, PixInsight 1.9.3)
+ * Copyright (c) 2026 Jacques Pouyaud.
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Free software under the GNU General Public License, version 3 or (at your
+ * option) any later version, WITHOUT ANY WARRANTY; see LICENSE.
  * Code écrit par Claude (Anthropic), sous la direction de Jacques Pouyaud.
  * https://github.com/jps-34/Badassium238
  * (ex-TrichromieSHO)
+ * v1.1.1 : licence GPL-3.0-or-later (1.1.0 et avant : MIT).
  * v1.1.0 : interface anglais / français, curseurs fins, passe 3 (palette).
  * ----------------------------------------------------------------------------
  * Passe 1 (Analyser)
@@ -64,7 +68,7 @@
 
 
 var TITLE   = "Badassium238";
-var VERSION = "1.1.0";
+var VERSION = "1.1.1";
 var LANG_KEY = "Badassium238/language";
 var LANG = "en";
 
