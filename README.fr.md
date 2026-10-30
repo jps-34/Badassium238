@@ -55,7 +55,7 @@ environ 24°, avec un écart de luminance mesuré nul et aucun nouveau pixel éc
 
 | Fichier | PixInsight |
 |---|---|
-| `scripts/Badassium238.js` (1.2.4) | 1.9.4 et suivants (moteur JavaScript V8) |
+| `scripts/Badassium238.js` (1.2.5) | 1.9.4 et suivants (moteur JavaScript V8) |
 | `scripts/legacy/Badassium238_PI193.js` (1.1.1, figée) | 1.8.9-3 à 1.9.3 (moteur historique) |
 
 PixInsight retire son moteur JavaScript historique (il est déjà absent sur macOS Apple Silicon) :
