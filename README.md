@@ -51,7 +51,7 @@ with a measured luminance change of 0 and no newly clipped pixel.
 
 | File | PixInsight |
 |---|---|
-| `scripts/Badassium238.js` (1.2.5) | 1.9.4 and later (V8 JavaScript engine) |
+| `scripts/Badassium238.js` (1.2.6) | 1.9.4 and later (V8 JavaScript engine) |
 | `scripts/legacy/Badassium238_PI193.js` (1.1.1, frozen) | 1.8.9-3 to 1.9.3 (legacy engine) |
 
 PixInsight is retiring its legacy JavaScript engine (it is already absent on macOS Apple Silicon),

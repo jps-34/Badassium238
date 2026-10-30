@@ -7,7 +7,7 @@
    original image. Interface in English or French.
 
 /*
- * Badassium238.js  v1.2.5
+ * Badassium238.js  v1.2.6
  * Copyright (c) 2026 Jacques Pouyaud.
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Free software under the GNU General Public License, version 3 or (at your
@@ -16,6 +16,7 @@
  * under the direction of Jacques Pouyaud.
  * https://github.com/jps-34/Badassium238
  *
+ * v1.2.6: Return in an edit box runs no button.
  * v1.2.5: menu entry moved to Script > JPS (was Script > Utilities).
  * v1.2.4: licence changed to GPL-3.0-or-later (1.2.3 and earlier: MIT).
  * v1.2.3: the restored-settings notice lists settings by their displayed names,
@@ -61,7 +62,7 @@
  */
 
 var TITLE = "Badassium238";
-var VERSION = "1.2.5";
+var VERSION = "1.2.6";
 var LANG_KEY = "Badassium238/language";
 var LANG = "en";
 var TIPS = {};
