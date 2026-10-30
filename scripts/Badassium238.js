@@ -1711,6 +1711,8 @@ var MixDialog = class extends Dialog {
 constructor()
 {
    super();
+   // Return must validate the edit boxes, not run a button of the dialog.
+   this.autoDefaultButton = false;
    var self = this;
    this.windowTitle = TITLE + " " + VERSION;
    this.relaunch = false;

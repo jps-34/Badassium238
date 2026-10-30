@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+* Return no longer runs a button of the dialog: PixInsight 1.9.6 activates the first button of a dialog
+  when Return is pressed in an edit box, which could start a run or reset the settings.
+
 ## 1.2.5 (2026-10-27)
 * Menu: the script moves from *Script > Utilities* to *Script > JPS*, the folder that groups
   the PixInsight scripts of Jacques Pouyaud. No change to the behaviour.
