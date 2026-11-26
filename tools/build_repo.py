@@ -5,18 +5,22 @@ Build the PixInsight update repository served from docs/ (GitHub Pages).
   python3 tools/build_repo.py --user <github_user>
 
 Creates, for the current script version:
-  docs/Badassium238-<version>-PI194.zip   V8 script, PixInsight 1.9.4 and later
-  docs/Badassium238-<version>-PI193.zip   legacy script, PixInsight 1.8.9-3 to 1.9.3
+  docs/Badassium238-<version>-PI195.zip   V8 script, PixInsight 1.9.5 and later
   docs/updates.xri                        repository index (unsigned)
 
 Each archive follows the layout required by PixInsight:
   src/scripts/Badassium238/<script>.js  (+ <script>.xsgn if present next to the .js)
   src/scripts/Badassium238/LICENSE
 
+The repository serves PixInsight 1.9.5 and later only: from 1.2.7 it is signed with the CPD
+identity jps-34, which the database of certified developers knows from PixInsight 1.9.5 on; an
+older PixInsight would reject the whole signed repository. The legacy script
+(scripts/legacy/Badassium238_PI193.js, PixInsight 1.9.3 and earlier) is no longer packaged: it
+stays in the repository for manual installation, unsigned (its old-style #feature-id carries no
+script identifier, which CodeSign requires).
+
 Order for a signed release:
   1. sign scripts/Badassium238.js with CodeSign (this creates Badassium238.xsgn next to it);
-     the legacy script stays unsigned: its old-style #feature-id carries no script identifier,
-     which CodeSign requires, and it targets PixInsight 1.9.3 and earlier;
   2. run this script (the .xsgn file is packed, SHA-1 digests computed);
   3. sign docs/updates.xri with CodeSign (last step: any later change to the
      archives or to updates.xri invalidates the signature);
@@ -31,22 +35,14 @@ NAME = "Badassium238"
 PACKAGES = [
     {
         "script": "scripts/Badassium238.js",
-        "suffix": "PI194",
-        "version": "1.9.4:1.9.99",
-        "title": "Badassium238 {v} (PixInsight 1.9.4 and later)",
+        "suffix": "PI195",
+        "version": "1.9.5:1.9.99",
+        "title": "Badassium238 {v} (PixInsight 1.9.5 and later)",
         "desc": "Breaks the two-colour look of SHO images: finds which emission lines end up with the "
                 "same hue, then gives each line its own colour (for example SII red, Ha gold, OIII blue) "
                 "by a hue-only rotation at constant luminance, with live preview and optional palette "
                 "presets. English or French interface. The original image is never modified. "
                 "Installs under Script > JPS > Badassium238.",
-    },
-    {
-        "script": "scripts/legacy/Badassium238_PI193.js",
-        "suffix": "PI193",
-        "version": "1.8.9-3:1.9.3",
-        "title": "Badassium238 {v} (PixInsight 1.9.3 and earlier)",
-        "desc": "Same tool for the legacy JavaScript engine of PixInsight 1.9.3 and earlier. "
-                "Installs under Script > Utilities > Badassium238 PI193.",
     },
 ]
 NOTICE = "Copyright (c) 2026 Jacques Pouyaud. GNU GPL v3 or later. Source: https://github.com/{user}/Badassium238"

@@ -55,12 +55,15 @@ environ 24°, avec un écart de luminance mesuré nul et aucun nouveau pixel éc
 
 | Fichier | PixInsight |
 |---|---|
-| `scripts/Badassium238.js` (1.2.6) | 1.9.4 et suivants (moteur JavaScript V8) |
-| `scripts/legacy/Badassium238_PI193.js` (1.1.1, figée) | 1.8.9-3 à 1.9.3 (moteur historique) |
+| `scripts/Badassium238.js` (1.2.7) | 1.9.5 et suivants par le dépôt de mises à jour ; 1.9.4 par installation à la main |
+| `scripts/legacy/Badassium238_PI193.js` (1.1.1, figée) | 1.8.9-3 à 1.9.3 (moteur historique), installation à la main seulement |
 
 PixInsight retire son moteur JavaScript historique (il est déjà absent sur macOS Apple Silicon) :
-à partir de la version 1.2, Badassium238 est développé pour le moteur V8 seulement. La version
-1.1 (1.1.1) reste disponible pour PixInsight 1.9.3 et antérieurs, par le même dépôt de mises à jour.
+à partir de la version 1.2, Badassium238 est développé pour le moteur V8 seulement. À partir de la
+1.2.7, le script et son dépôt de mises à jour sont signés avec mon identité de développeur certifié
+PixInsight, `jps-34`, que PixInsight reconnaît à partir de la version 1.9.5 : le dépôt de mises à jour
+ne sert donc plus que PixInsight 1.9.5 et suivants. La version 1.1 (1.1.1) pour PixInsight 1.9.3 et
+antérieurs reste disponible dans ce dépôt, pour une installation à la main.
 
 Les images, toutes alignées pixel à pixel (pas de recadrage ni de rotation entre elles) :
 
@@ -86,14 +89,20 @@ l'analyse et tous les réglages, et le choix est mémorisé.
 2. *Resources > Updates > Check for Updates*, puis redémarrer PixInsight.
 3. Le script apparaît dans *Script > JPS > Badassium238* (*Script > Utilities* jusqu'à la 1.2.4).
 
-Tant que le dépôt n'est pas signé, PixInsight ne l'accepte que si l'option de sécurité
-*Allow unsigned update repositories* est activée.
+Le dépôt et le script sont signés avec mon identité de développeur certifié PixInsight, `jps-34`.
+Si PixInsight signale une **identité de signature inconnue** (*unknown code signing identity*) à
+l'ajout du dépôt, installer d'abord la mise à jour de PixInsight (*Resources > Updates > Check for
+Updates*, puis redémarrer PixInsight) : elle apporte la base des développeurs certifiés qui contient
+`jps-34`. Puis relancer la recherche de mises à jour.
 
 ### À la main
 
 Télécharger le `.js` qui correspond à ta version de PixInsight, puis soit le lancer avec
 *Script > Execute Script File*, soit ajouter son dossier avec *Script > Feature Scripts > Add* pour
-qu'il apparaisse dans le menu *Script > JPS*.
+qu'il apparaisse dans le menu *Script > JPS*. Avec PixInsight 1.9.5 et suivants, garder
+`Badassium238.xsgn` à côté de `Badassium238.js` pour que sa signature soit vérifiée. Avec PixInsight
+1.9.4, télécharger le `.js` seul : cette version ne connaît pas l'identité `jps-34` et refuserait le
+script signé.
 
 ## Démarrage rapide
 

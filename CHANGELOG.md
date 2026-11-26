@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.7 (2026-11-26)
+* The script and its update repository are signed with my Certified PixInsight Developer identity,
+  `jps-34`. No change to the behaviour.
+* The update repository now serves PixInsight 1.9.5 and later only: PixInsight recognises the `jps-34`
+  identity from version 1.9.5. If PixInsight reports an unknown code signing identity, install the
+  PixInsight update first (*Resources > Updates > Check for Updates*, then restart). PixInsight 1.9.4
+  users can still install the script by hand, without its signature file.
+* The legacy version for PixInsight 1.9.3 and earlier (1.1.1) is no longer served by the update
+  repository; it stays available in `scripts/legacy/` for manual installation.
+
 ## 1.2.6 (2026-10-30)
 * Return no longer runs a button of the dialog: PixInsight 1.9.6 activates the first button of a dialog
   when Return is pressed in an edit box, which could start a run or reset the settings.
