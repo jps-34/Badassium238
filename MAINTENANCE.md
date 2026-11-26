@@ -29,8 +29,8 @@ packaged, installed or run by the script.
    `https://jps-34.github.io/Badassium238/`.
 
 4. Test: in PixInsight, *Resources > Updates > Manage Repositories*, add this URL, then
-   *Check for Updates*. Until it is signed, the *Allow unsigned update repositories* security
-   option is required.
+   *Check for Updates*. (Before the signed releases, the *Allow unsigned update repositories*
+   security option was required; the repository is signed with the CPD identity `jps-34` since then.)
 
 ## 2. Signing (once and for all)
 
@@ -87,7 +87,7 @@ git switch dev
 
 Then, in PixInsight, *Resources > Updates > Check for Updates*.
 
-With signing (later), order matters: sign `scripts/Badassium238.js` with **CodeSign**, run
+Signed releases (CPD identity `jps-34`, since 1.2.7), order matters: sign `scripts/Badassium238.js` with **CodeSign**, run
 `python3 tools/build_repo.py --user jps-34`, sign `docs/updates.xri` last, then commit.
 
 ## 4. Versions and history
