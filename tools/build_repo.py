@@ -14,9 +14,10 @@ Each archive follows the layout required by PixInsight:
   src/scripts/Badassium238/LICENSE
 
 Order for a signed release:
-  1. sign scripts/Badassium238.js and scripts/legacy/Badassium238_PI193.js with
-     CodeSign (this creates the .xsgn files next to them);
-  2. run this script (the .xsgn files are packed, SHA-1 digests computed);
+  1. sign scripts/Badassium238.js with CodeSign (this creates Badassium238.xsgn next to it);
+     the legacy script stays unsigned: its old-style #feature-id carries no script identifier,
+     which CodeSign requires, and it targets PixInsight 1.9.3 and earlier;
+  2. run this script (the .xsgn file is packed, SHA-1 digests computed);
   3. sign docs/updates.xri with CodeSign (last step: any later change to the
      archives or to updates.xri invalidates the signature);
   4. commit and push.
